@@ -1,0 +1,58 @@
+protocol = "iot protocol"
+endianess = LITTLE
+
+packet ACK {
+	id bytes(1) pid = 0x01;
+	uint8 ack_id;
+};
+
+packet NAK {
+	id bytes(1) pid = 0x02;
+	uint8 nak_id;
+};
+
+packet EOT {
+	id bytes(1) pid = 0x03;
+};
+
+packet CHALL {
+	id bytes(1) pid = 0x04;
+	uint64 random_number;
+};
+
+packet CHALL_RESP {
+	id bytes(1) pid = 0x05;
+	bytes(256) encrypted_number;
+};
+
+packet KEY {
+	id bytes(1) pid = 0x06;
+	bytes(16) symmetric_key;
+};
+
+packet DESC {
+	id bytes(1) pid = 0x07;
+	bytes(1) device_class;
+	string(64) name;
+	string(4) unit_name;
+	float min_value;
+	float max_value;
+};
+
+packet VAL {
+	id bytes(1) pid = 0x08;
+	uint8 service_id;
+	uint32 timestamp;
+};
+
+packet SET {
+	id bytes(1) pid = 0x09;
+	uint8 service_id;
+	float value;
+};
+
+packet EXIT {
+	id bytes(1) pid = 0xa0;
+	uint8 service_id;
+};
+

@@ -1,0 +1,74 @@
+packet ACK {
+	1x: pid = 0x01;
+	1d: id; 
+};
+
+packet NAK {
+	1x: pid = 0x02;
+	1d: id;
+};
+
+packet EOT {
+	1x: pid = 0x03;
+};
+
+packet CHALL {
+	1x: pid = 0x04;
+	8x: random_number;
+};
+
+packet CHALL_RESP {
+	1x: pid = 0x05;
+	256x: encrypted_number;
+};
+
+packet KEY {
+	1x: pid = 0x06;
+	16x: symmetric_key;
+};
+
+packet DESC {
+	1x: pid = 0x07;
+	1x: device_class;
+	64s: service_name;
+	4s: unit_name;
+	4f: min_value;
+	4f: max_value;
+};
+
+packet VAL {
+	1x: pid = 0x08;
+	1d: service_id;
+	4f: value;
+	4d: time_stamp;
+};
+
+packet SET {
+	1x: pid = 0x09;
+	1d: service_id;
+	4f: value;
+};
+
+packet EXIT {
+	1x: pid = 0x0a;
+	1x: service_id;
+};
+	
+ 
+protokol ::= rejestracja_udane komunikcja | rejestracja_nieudana
+komunikacja ::= transmisja | komunikacja
+rejestracja ::= autoryzacja czyt_deskryptory
+autoryzacja ::= autoryzacja_klienta autoryzacja_serwera
+autoryzacja_klienta ::= autoryzacja_pozytywna | autoryzacja_negatywna
+
+autoryzacja_serwera_pozytywna ::= CHALL CHALL_RESP ACK
+autoryzacja_serwera_negatywna ::= CHALL CHALL_RESP NAK
+
+autoryzacja_serwera ::= autoryzacja_serwera_pozytywna | autoryzacja_serwera_negatywna
+autoryzacja_serwera_pozytywna ::= CHALL CHALL_RESP przeslanie_klucza
+przeslanie_klucza ::= KEY
+
+autoryzacja_serwera_negatywna ::= CHALL CHALL_RESP NAK
+
+
+
