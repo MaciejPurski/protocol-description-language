@@ -1,0 +1,5 @@
+abc def; 0x12 1234
+ghg 1234
+ilk
+"dupa";(123)
+abcd_sasd

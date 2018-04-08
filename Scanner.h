@@ -3,53 +3,27 @@
 #include <iostream>
 #include <unordered_map>
 #include "Source.h"
-enum TokenType {
-	T_VAR_KEYWORD, T_PACK_KEYWORD, T_RULE_KEYWORD, T_INT8, T_INT16, T_INT32, T_INT64, T_UINT8, T_UINT16, T_UINT32, T_UINT64,
-	T_FLOAT, T_DOUBLE, T_BYTE, T_STR_T, T_IDENT, T_STRING, T_OPEN_PARENT, T_CLOSE_PARENT, T_OPEN_BRACK, T_CLOSE_BRACK, T_ASSIGN, T_COLON,
-	T_SEMICOLON, T_ASTERIX, T_DECIMAL, T_HEX, T_QUOTE, T_UNKNOWN, T_END
-};
+#include "Token.h"
 
-struct Token {
-	TokenType  type;
-	std::string stringValue;
-	int intValue;
-
-	explicit Token(TokenType nType, std::string strValue = "", int nintValue = 0) : type(nType), stringValue(strValue), intValue(nintValue) {}
-};
-
+/**
+ * Class used by the interpreter to get new token.
+ * It gets next character from Source class.
+ */
 class Scanner {
 private:
 	Source &src;
 	int ch; // current character
+	std::unordered_map<std::string, TokenType> keywordMap;
+	std::unordered_map<TokenType, std::string> tokenToName;
 
-	const std::unordered_map<std::string, TokenType> keywordMap = {
-			{"VARIABLES", T_VAR_KEYWORD},
-			{"PACKETS", T_PACK_KEYWORD},
-			{"RULES", T_RULE_KEYWORD},
-			{"int8", T_INT8},
-			{"int16", T_INT16},
-			{"int32", T_INT32},
-			{"int64", T_INT64},
-			{"uint8", T_UINT8},
-			{"uint16", T_UINT16},
-			{"uint32", T_UINT32},
-			{"uint64", T_UINT64},
-			{"float", T_FLOAT},
-			{"double", T_DOUBLE},
-			{"bytes", T_BYTE},
-			{"string", T_STRING},
-			{"(", T_OPEN_PARENT},
-			{")", T_CLOSE_PARENT},
-			{"{", T_OPEN_BRACK},
-			{"}", T_CLOSE_BRACK},
-			{"=", T_ASSIGN},
-			{":", T_COLON},
-			{";", T_SEMICOLON},
-			{"*", T_ASTERIX},
-			{"\"", T_QUOTE}
-	};
-
-	Token getKeywordToken(const int ch);
+	bool isKeyword(const int c);
+	bool isHex(const int c);
+	int toHex(const int c);
+	Token getKeywordToken(const int c);
+	Token getIdentifierToken(const int c);
+	Token getDecimalToken(const int c);
+	Token getHexadecimalToken(const int c);
+	Token getConstStringToken(const int c);
 
 	void nextChar() {
 		ch = src.nextChar();
@@ -57,48 +31,9 @@ private:
 
 
 public:
-	explicit Scanner(Source &s) : src(s) {
-		ch = '\n';
-	}
-
-	std::unordered_map<TokenType, std::string> tokenToName = {
-			{T_VAR_KEYWORD, "T_VAR_KEYWORD"},
-			{T_PACK_KEYWORD, "T_PACK_KEYWORD"},
-			{T_RULE_KEYWORD, "T_RULE_KEYWORD"},
-			{T_INT8, "T_INT8"},
-			{T_INT16, "T_INT16"},
-			{T_INT32, "T_INT32"},
-			{T_INT64, "T_INT64"},
-			{T_UINT8, "T_UINT8"},
-			{T_UINT16, "T_UINT16"},
-			{T_UINT32, "T_UINT32"},
-			{T_UINT64, "T_UINT64"},
-			{T_FLOAT, "T_FLOAT"},
-			{T_DOUBLE, "T_DOUBLE"},
-			{T_BYTE, "T_BYTE"},
-			{T_STR_T, "T_STR_T"},
-			{T_IDENT, "T_IDENT"},
-			{T_STRING, "T_STRING"},
-			{T_OPEN_PARENT, "T_OPEN_PARENT"},
-			{T_CLOSE_PARENT, "T_CLOSE_PARENT"},
-			{T_OPEN_BRACK, "T_OPEN_BRACK"},
-			{T_CLOSE_BRACK, "T_OPEN_BRACK"},
-			{T_ASSIGN, "T_ASSIGN"},
-			{T_COLON, "T_COLON"},
-			{T_SEMICOLON, "T_SEMICOLON"},
-			{T_ASTERIX, "T_ASTERIX"},
-			{T_DECIMAL, "T_DECIMAL"},
-			{T_HEX, "T_HEX"},
-			{T_QUOTE, "T_QUOTE"},
-			{T_UNKNOWN, "T_UNKNOWN"},
-			{T_END, "T_TEST"}
-	};
-
-
-
-
+	explicit Scanner(Source &s);
 	Token nextToken();
-
+	std::string tokenToString(const Token &t);
 };
 
 

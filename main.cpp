@@ -3,13 +3,13 @@
 #include "Source.h"
 
 int main() {
-    Source src("test2.txt");
+    Source src("../tests/full-test.txt");
 	Scanner s(src);
 
 	Token t = s.nextToken();
 
-	while (t.type != T_UNKNOWN) {
-		std::cout << "TOKEN: " << s.tokenToName[t.type] << " " << t.stringValue << " " << t.intValue << std::endl;
+	while (t.type != T_END) {
+		std::cout << "TOKEN: " << s.tokenToString(t) << " " << t.stringValue << " " << t.intValue << std::endl;
 		t = s.nextToken();
 	}
 

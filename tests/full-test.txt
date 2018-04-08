@@ -1,0 +1,102 @@
+VARIABLES:
+
+protocol = "iot protocol";
+endianess = "LITTLE";
+root_symbol = "protokol";
+packet_id = 0;
+
+PACKETS:
+
+ACK {
+	bytes(1) pid = 0x01;
+	uint8 ack_id;
+};
+
+NAK {
+	bytes(1) pid = 0x02;
+	uint8 nak_id;
+};
+
+EOT {
+	id bytes(1) pid = 0x03;
+};
+
+CHALL {
+	bytes(1) pid = 0x04;
+	uint64 random_number;
+};
+
+CHALL_RESP {
+	bytes(1) pid = 0x05;
+	bytes(256) encrypted_number;
+};
+
+KEY {
+	bytes(1) pid = 0x06;
+	bytes(16) symmetric_key;
+};
+
+DESC {
+	bytes(1) pid = 0x07;
+	bytes(1) device_class;
+	string(64) name;
+	string(4) unit_name;
+	float min_value;
+	float max_value;
+};
+
+VAL {
+	bytes(1) pid = 0x08;
+	uint8 service_id;
+	uint32 timestamp;
+};
+
+SET {
+	bytes(1) pid = 0x09;
+	uint8 service_id;
+	float value;
+};
+
+EXIT {
+	bytes(1) pid = 0x0a;
+	uint8 service_id;
+};
+
+RULES:
+
+protokol = rejestracja transmisja*;
+ 
+rejestracja = autoryzacja czyt_deskryptory;
+
+autoryzacja = autoryzacja_klienta autoryzacja_serwera;
+
+autoryzacja_klienta = autoryzacja_klienta_pozytywna;
+autoryzacja_klienta = autoryzacja_klienta_negatywna;
+
+autoryzacja_serwera = autoryzacja_serwera_pozytywna;
+autoryzacja_serwera = autoryzacja_serwera_negatywna;
+
+autoryzacja_serwera_pozytywna = "CHALL" "CHALL_RESP" "KEY";
+autoryzacja_serwera_negatywna = "CHALL" "CHALL_RESP" "NAK";
+
+autoryzacja_klienta_pozytywna = "CHALL" "CHALL_RESP" "ACK";
+autoryzacja_klienta_negatywna = "CHALL" "CHALL_RESP" "NAK";
+
+czyt_deskryptory = deskryptor*;
+
+deskryptor = deskryptor_zaakceptowany;
+deskryptor = deskryptor_odrzucony;
+
+deskryptor_zaakceptowany = "DESC" "ACK";
+deskryptor_niezaakceptowany = "DESC" "NAK";
+
+transmisja = "KEY" odczyt_wejsc wyslanie_komend;
+
+odczyt_wejsc = "VAL"*, "EOT";
+
+wyslanie_komend = komenda* "EOT";
+komenda_zaakceptowana = "SET" "ACK";
+komenda_odrzucona = "SET" "NAK";
+
+
+

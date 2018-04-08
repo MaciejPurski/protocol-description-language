@@ -14,15 +14,13 @@ private:
 	std::string lineBuffer;
 	int nErrors;
 	int tokenBegin;
-	int lineErrors;
 
 public:
-	Source(std::string fileName);
+	explicit Source(const std::string &fileName);
 	~Source();
-	void raiseError(std::string errorDesc);
+	void raiseError(const std::string &errorDesc);
 	int nextChar();
 	void setTokenBegin();
-
 };
 
 

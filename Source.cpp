@@ -3,7 +3,7 @@
 #include <iomanip>
 
 
-void Source::raiseError(std::string errorDesc) {
+void Source::raiseError(const std::string &errorDesc) {
 	nErrors++;
 
 	std::cout << fileName <<": " << linePosition <<": " << characterPosition << ": error: " << errorDesc << std::endl;
@@ -18,9 +18,8 @@ void Source::raiseError(std::string errorDesc) {
 }
 
 int Source::nextChar() {
-	bool isEnd;
-
 	characterPosition++;
+
 	// read a line to the buffer if necessary
 	if (characterPosition >= lineBuffer.size()) {
 		std::string temp;
@@ -33,7 +32,6 @@ int Source::nextChar() {
 			linePosition = 0;
 			tokenBegin = 0;
 			characterPosition = -1;
-			lineErrors = 0;
 
 			return '\n';
 		}
@@ -42,10 +40,9 @@ int Source::nextChar() {
 	return lineBuffer[characterPosition];
 }
 
-Source::Source(std::string nFileName) {
+Source::Source(const std::string &nFileName) {
 	fileName = nFileName;
 	nErrors = 0;
-	lineErrors = 0;
 	characterPosition = 0;
 	linePosition = 0;
 	lineBuffer = "";
