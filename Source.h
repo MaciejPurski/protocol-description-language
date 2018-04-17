@@ -21,6 +21,13 @@ public:
 	void raiseError(const std::string &errorDesc);
 	int nextChar();
 	void setTokenBegin();
+	int getNErrors();
+
+	void strToRed(std::string &str);
+
+	std::string strToRed(const std::string &str);
+
+	std::string strToWhite(const std::string &str);
 };
 
 

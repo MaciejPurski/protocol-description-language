@@ -2,11 +2,19 @@
 #include <exception>
 #include <iomanip>
 
+std::string Source::strToRed(const std::string &str) {
+	return  std::string("\033[1;31m" + str + "\033[0m");
+}
 
+std::string Source::strToWhite(const std::string &str) {
+	return  std::string("\033[1;37m" + str + "\033[0m");
+}
 void Source::raiseError(const std::string &errorDesc) {
 	nErrors++;
 
-	std::cout << fileName <<": " << linePosition <<": " << characterPosition << ": error: " << errorDesc << std::endl;
+	std::cout << std::endl;
+	std::cout << strToWhite(fileName + ":" + std::to_string(linePosition + 1) + ":" + std::to_string(characterPosition + 1) + ": ")
+	          << strToRed("error: ") << errorDesc << std::endl;
 	std::cout << lineBuffer << std::endl;
 	for (int i = 0; i < tokenBegin; i++)
 		std::cout << " ";
@@ -14,7 +22,7 @@ void Source::raiseError(const std::string &errorDesc) {
 	for (int i = tokenBegin; i < characterPosition; i++)
 		std::cout << "~";
 
-	std::cout << "^" << std::endl;
+	std::cout << "^" << std::endl << std::endl;
 }
 
 int Source::nextChar() {
@@ -29,7 +37,7 @@ int Source::nextChar() {
 		} else {
 			// new line successfuly read
 			lineBuffer = temp;
-			linePosition = 0;
+			linePosition++;
 			tokenBegin = 0;
 			characterPosition = -1;
 
@@ -60,4 +68,8 @@ Source::~Source() {
 
 void Source::setTokenBegin() {
 	tokenBegin = characterPosition;
+}
+
+int Source::getNErrors() {
+	return nErrors;
 }

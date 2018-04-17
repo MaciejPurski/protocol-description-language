@@ -6,7 +6,7 @@ Token Scanner::nextToken() {
 		nextChar(); // omit white spaces
 
 	if (ch == EOF)
-		return Token(T_END);
+		return Token(END);
 
 	if (isKeyword(ch))
 		return getKeywordToken(ch);
@@ -34,72 +34,62 @@ Token Scanner::nextToken() {
 	nextChar();
 	src.raiseError("Unknown token");
 
-	return Token(T_UNKNOWN);
-
+	return Token(UNKNOWN);
 }
 
 Scanner::Scanner(Source &s) : src(s) {
 	// initialize maps
 	std::unordered_map<std::string, TokenType> keywordMapTemp = {
-			{"VARIABLES", T_VAR_KEYWORD},
-			{"PACKETS", T_PACK_KEYWORD},
-			{"RULES", T_RULE_KEYWORD},
-			{"int8", T_INT8},
-			{"int16", T_INT16},
-			{"int32", T_INT32},
-			{"int64", T_INT64},
-			{"uint8", T_UINT8},
-			{"uint16", T_UINT16},
-			{"uint32", T_UINT32},
-			{"uint64", T_UINT64},
-			{"float", T_FLOAT},
-			{"double", T_DOUBLE},
-			{"bytes", T_BYTE},
-			{"string", T_STRING},
-			{"(", T_OPEN_PARENT},
-			{")", T_CLOSE_PARENT},
-			{"{", T_OPEN_BRACK},
-			{"}", T_CLOSE_BRACK},
-			{"=", T_ASSIGN},
-			{":", T_COLON},
-			{";", T_SEMICOLON},
-			{"*", T_ASTERIX},
-			{",", T_COMMA}
+			{"iterate", ITERATE_KEYWORD},
+			{"alt", ALT_KEYWORD},
+			{"or", OR_KEYWORD},
+			{"opt", OPT_KEYWORD},
+			{"repeat", REPEAT_KEYWORD},
+			{"int", INT_TYPE},
+			{"uint", UINT_TYPE},
+			{"bytes", BYTES_TYPE},
+			{"string", STRING_TYPE},
+			{"bits", BITS_TYPE},
+			{"+", ADD_OPERATOR},
+			{"-", SUBTR_OPERATOR},
+			{"*", MUL_OPERATOR},
+			{"(", OPEN_PARENT},
+			{")", CLOSE_PARENT},
+			{"{", OPEN_BRACK},
+			{"}", CLOSE_BRACK},
+			{";", SEMICOLON},
+			{"=", ASSIGNMENT},
+			{",", COMMA}
 	};
 
 	keywordMap = std::move(keywordMapTemp);
 
 	std::unordered_map<TokenType, std::string> tokenMapTemp = {
-		{T_VAR_KEYWORD, "T_VAR_KEYWORD"},
-		{T_PACK_KEYWORD, "T_PACK_KEYWORD"},
-		{T_RULE_KEYWORD, "T_RULE_KEYWORD"},
-		{T_INT8, "T_INT8"},
-		{T_INT16, "T_INT16"},
-		{T_INT32, "T_INT32"},
-		{T_INT64, "T_INT64"},
-		{T_UINT8, "T_UINT8"},
-		{T_UINT16, "T_UINT16"},
-		{T_UINT32, "T_UINT32"},
-		{T_UINT64, "T_UINT64"},
-		{T_FLOAT, "T_FLOAT"},
-		{T_DOUBLE, "T_DOUBLE"},
-		{T_BYTE, "T_BYTE"},
-		{T_STR_T, "T_STR_T"},
-		{T_IDENT, "T_IDENT"},
-		{T_STRING, "T_STRING"},
-		{T_OPEN_PARENT, "T_OPEN_PARENT"},
-		{T_CLOSE_PARENT, "T_CLOSE_PARENT"},
-		{T_OPEN_BRACK, "T_OPEN_BRACK"},
-		{T_CLOSE_BRACK, "T_OPEN_BRACK"},
-		{T_ASSIGN, "T_ASSIGN"},
-		{T_COLON, "T_COLON"},
-		{T_SEMICOLON, "T_SEMICOLON"},
-		{T_ASTERIX, "T_ASTERIX"},
-		{T_DECIMAL, "T_DECIMAL"},
-		{T_HEX, "T_HEX"},
-		{T_UNKNOWN, "T_UNKNOWN"},
-		{T_END, "T_END"},
-		{T_COMMA, "T_COMMA"}
+			{ITERATE_KEYWORD, "ITERATE KEYWORD"},
+			{ALT_KEYWORD, "ALT KEYWORD"},
+			{OR_KEYWORD, "OR KEYWORD"},
+			{OPT_KEYWORD, "OPT KEYWORD"},
+			{REPEAT_KEYWORD, "REPEAT KEYWORD"},
+			{INT_TYPE, "INT_TYPE"},
+			{UINT_TYPE, "UINT_TYPE"},
+			{BYTES_TYPE, "BYTES TYPE"},
+			{STRING_TYPE, "STRING TYPE"},
+			{BITS_TYPE, "BITS TYPE"},
+			{ADD_OPERATOR, "ADD OPERATOR"},
+			{SUBTR_OPERATOR, "SUBTR OPERATOR"},
+			{MUL_OPERATOR, "MUL OPERATOR"},
+			{OPEN_PARENT, "OPEN PARENT"},
+			{CLOSE_PARENT, "CLOSE PARENT"},
+			{OPEN_BRACK, "OPEN BRACK"},
+			{CLOSE_BRACK, "CLOSE BRACK"},
+			{SEMICOLON, "SEMICOLON"},
+			{ASSIGNMENT, "ASSIGNMNET"},
+			{DEC_NUMBER, "DEC NUMBER"},
+			{HEX_NUMBER, "HEX NUMBER"},
+			{COMMA, "COMMA"},
+			{UNKNOWN, "UNKOWN"},
+			{END, "END"},
+			{IDENTIFIER, "IDENTIFIER"}
 	};
 
 	tokenToName = std::move(tokenMapTemp);
@@ -128,7 +118,7 @@ Token Scanner::getKeywordToken(const int ch) {
 	if (it != keywordMap.end())
 		return Token(it->second);
 
-	return Token(T_UNKNOWN);
+	return Token(UNKNOWN);
 }
 
 Token Scanner::getIdentifierToken(const int c) {
@@ -144,7 +134,7 @@ Token Scanner::getIdentifierToken(const int c) {
 
 	// not a keyword
 	if (it2 == keywordMap.end())
-		return Token(T_IDENT, str);
+		return Token(IDENTIFIER, str);
 	else
 		return Token(it2->second, str);
 }
@@ -162,11 +152,11 @@ Token Scanner::getDecimalToken(const int c) {
 	if (!isspace(ch) && ch != EOF && !isKeyword(ch)) {
 		src.raiseError("Wrong decimal number format");
 
-		return Token(T_UNKNOWN);
+		return Token(UNKNOWN);
 	}
 
 
-	return Token(T_DECIMAL, "", value);
+	return Token(DEC_NUMBER, "", value);
 }
 
 Token Scanner::getHexadecimalToken(const int c) {
@@ -176,9 +166,9 @@ Token Scanner::getHexadecimalToken(const int c) {
 	if (ch != 'x') {
 		// decimal value 0
 		if (isspace(ch) || ch == EOF || isKeyword(ch))
-			return Token(T_DECIMAL, "", 0);
+			return Token(DEC_NUMBER, "", 0);
 		src.raiseError("Wrong hex number format");
-		return Token(T_UNKNOWN);
+		return Token(UNKNOWN);
 	}
 
 	int value = 0;
@@ -192,10 +182,10 @@ Token Scanner::getHexadecimalToken(const int c) {
 
 	if (!isspace(ch) && ch != EOF && !isKeyword(ch)) {
 		src.raiseError("Wrong hexadecimal number format");
-		return Token(T_UNKNOWN);
+		return Token(UNKNOWN);
 	}
 
-	return Token(T_HEX, "", value);
+	return Token(HEX_NUMBER, "", value);
 }
 
 Token Scanner::getConstStringToken(const int c) {
@@ -211,12 +201,12 @@ Token Scanner::getConstStringToken(const int c) {
 
 	if (ch == EOF) {
 		src.raiseError("Quotation not closed");
-		return Token(T_UNKNOWN);
+		return Token(UNKNOWN);
 	}
 
 	nextChar();
 
-	return Token(T_STRING, str);
+	return Token(STRING_TYPE, str);
 }
 
 bool Scanner::isHex(const int c) {
