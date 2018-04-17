@@ -9,27 +9,35 @@ std::string Source::strToRed(const std::string &str) {
 std::string Source::strToWhite(const std::string &str) {
 	return  std::string("\033[1;37m" + str + "\033[0m");
 }
-void Source::raiseError(const std::string &errorDesc) {
+
+void Source::raiseError(const std::string &token,
+			const std::string &errorDesc) {
 	nErrors++;
 
+	std::cout << "TOKEN: " << token << std::endl;
 	std::cout << std::endl;
 	std::cout << strToWhite(fileName + ":" + std::to_string(linePosition + 1) + ":" + std::to_string(characterPosition + 1) + ": ")
 	          << strToRed("error: ") << errorDesc << std::endl;
-	std::cout << lineBuffer << std::endl;
+	std::cout << lineBuffer.substr(0, tokenBegin) << strToRed(token)
+	<< lineBuffer.substr(tokenBegin + token.size()) << std::endl;
 	for (int i = 0; i < tokenBegin; i++)
 		std::cout << " ";
 
-	for (int i = tokenBegin; i < characterPosition; i++)
-		std::cout << "~";
+	std::string underline = "^";
 
-	std::cout << "^" << std::endl << std::endl;
+
+	for (int i = tokenBegin; i < characterPosition - 1; i++)
+		underline += '~';
+
+	std::cout << strToRed(underline) << std::endl;
+
 }
 
 int Source::nextChar() {
 	characterPosition++;
 
 	// read a line to the buffer if necessary
-	if (characterPosition >= lineBuffer.size()) {
+	if (characterPosition > lineBuffer.size()) {
 		std::string temp;
 
 		if (!std::getline(file, temp)) {
@@ -43,6 +51,8 @@ int Source::nextChar() {
 
 			return '\n';
 		}
+	} else if (characterPosition == lineBuffer.size()) {
+		return '\n';
 	}
 
 	return lineBuffer[characterPosition];

@@ -18,12 +18,11 @@ private:
 public:
 	explicit Source(const std::string &fileName);
 	~Source();
-	void raiseError(const std::string &errorDesc);
+	void raiseError(const std::string &token,
+			const std::string &errorDesc);
 	int nextChar();
 	void setTokenBegin();
 	int getNErrors();
-
-	void strToRed(std::string &str);
 
 	std::string strToRed(const std::string &str);
 
