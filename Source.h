@@ -8,23 +8,22 @@ class Source {
 private:
 	std::string fileName;
 	std::fstream file;
+	bool testMode;
 
 	int characterPosition;
 	int linePosition;
 	std::string lineBuffer;
 	int nErrors;
-	int tokenBegin;
 	std::string strToRed(const std::string &str);
 	std::string strToWhite(const std::string &str);
 
 
 public:
-	explicit Source(const std::string &fileName);
+	explicit Source(const std::string &fileName, bool testMode);
 	~Source();
 	void raiseError(const std::string &errorDesc,
 			int begIndex, int midIndex, int endIndex);
 	int nextChar();
-	void setTokenBegin();
 	int getNErrors();
 	void printLine();
 	int getIndex();

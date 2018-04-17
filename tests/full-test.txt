@@ -1,0 +1,111 @@
+packet ACK {
+	bytes(1) pid = 0x01;
+	uint(1) ack_id;
+}
+
+packet NAK {
+	bytes(1) pid = 0x02;
+	uint(1) nak_id;
+}
+
+packet EOT {
+	bytes(1) pid = 0x03;
+}
+
+packet CHALL {
+	bytes(1) pid = 0x04;
+	uint(64) random_number;
+}
+
+packet CHALL_RESP {
+	bytes(1) pid = 0x05;
+	bytes(256) encrypted_number;
+}
+packet KEY {
+	bytes(1) pid = 0x06;
+	bytes(16) symmetric_key;
+}
+
+packet DESC {
+	bytes(1) pid = 0x07;
+	bytes(1) device_class;
+	string(64) name;
+	string(4) unit_name;
+	int(4) min_value;
+	int(4) max_value;
+}
+
+packet VAL {
+	bytes(1) pid = 0x08;
+	uint(1) service_id;
+	uint(4) timestamp;
+}
+
+packet SET {
+	bytes(1) pid = 0x09;
+	uint(1) service_id;
+	int(4) value;
+}
+
+packet EXIT {
+	bytes(1) pid = 0x0a;
+	uint(1) service_id;
+}
+
+sequence wyslanie_komend {
+	iterate {
+		SET;
+	#a command can be accepted or not
+	alt {
+		ACK;
+	} or {
+		NAK;
+	}
+	}
+}
+
+sequence odczyt_wejsc {
+	do_iterate { VAL;}
+	EOT;
+}
+
+sequence transmisja {
+	KEY;
+	odczyt_wejsc();
+	wyslanie_komend();
+}
+
+sequence czyt_deskryptory {
+	DESC;
+	alt {
+		ACK;
+	} or {
+	NAK;
+	}
+}
+
+sequence autoryzacja {
+	repeat(2) {
+		CHALL;
+		CHALL_RESP;
+	alt {
+		ACK;
+	} or {
+		NAK;
+	}
+	}
+}
+
+sequence rejestracja {
+	autoryzacja();
+	iterate {
+		czyt_deskryptory();
+	}
+}
+
+protocol iot_protocol {
+	rejestracja();
+	iterate {
+	transmisja();
+	}
+}

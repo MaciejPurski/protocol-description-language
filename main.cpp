@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstring>
 #include "Scanner.h"
-#include "Source.h"
+#include "LexerTest.h"
 
 int main(int argc, char *argv[]) {
 	if (argc != 3) {
@@ -14,25 +14,13 @@ int main(int argc, char *argv[]) {
 
 	if (!strcmp(argv[1], "--lexer-test")) {
 		try {
-			Source src(argv[2]);
-			Scanner s(src);
+			LexerTest l(argv[2]);
 
-			Token t = s.nextToken();
-
-			//if (src.getIndex() == 0)
-			//	src.printLine();
-
-			while (t.type != END) {
-				std::cout << "TOKEN: " << s.tokenToString(t) << " " << t.stringValue << " " << t.intValue << std::endl;
-				t = s.nextToken();
-			}
-			std::cout << std::endl;
-			std::cout << "Number of scanning errors: " << src.getNErrors() << std::endl;
-
+			l.startTest();
 		} catch (std::exception &e) {
-			std::cerr << e.what() << std::endl;
-			std::cerr << "Program terminated\n";
-			exit(1);
+			std::cout << e.what() << std::endl;
+
+			std::cout << "Program terminated\n";
 		}
 
 	} else {

@@ -33,7 +33,7 @@ Token Scanner::nextToken() {
 		std::string word;
 
 		do {
-			word += ch;
+			word += (char) ch;
 			nextChar();
 		} while (isalnum(ch) || ch == '_');
 
@@ -56,7 +56,11 @@ Token Scanner::nextToken() {
 Scanner::Scanner(Source &s) : src(s) {
 	// initialize maps
 	std::unordered_map<std::string, TokenType> keywordMapTemp = {
+			{"packet", PACKET_KEYWORD},
+			{"sequence", SEQUENCE_KEYWORD},
+			{"protocol", PROTOCOL_KEYWORD},
 			{"iterate", ITERATE_KEYWORD},
+			{"do_iterate", DOITERATE_KEYWORD},
 			{"alt", ALT_KEYWORD},
 			{"or", OR_KEYWORD},
 			{"opt", OPT_KEYWORD},
@@ -84,46 +88,7 @@ Scanner::Scanner(Source &s) : src(s) {
 	keywordMap = std::move(keywordMapTemp);
 	separatorMap = std::move(separatorMapTemp);
 
-	std::unordered_map<TokenType, std::string> tokenMapTemp = {
-			{ITERATE_KEYWORD, "ITERATE KEYWORD"},
-			{ALT_KEYWORD, "ALT KEYWORD"},
-			{OR_KEYWORD, "OR KEYWORD"},
-			{OPT_KEYWORD, "OPT KEYWORD"},
-			{REPEAT_KEYWORD, "REPEAT KEYWORD"},
-			{INT_TYPE, "INT_TYPE"},
-			{UINT_TYPE, "UINT_TYPE"},
-			{BYTES_TYPE, "BYTES TYPE"},
-			{STRING_TYPE, "STRING TYPE"},
-			{BITS_TYPE, "BITS TYPE"},
-			{ADD_OPERATOR, "ADD OPERATOR"},
-			{SUBTR_OPERATOR, "SUBTR OPERATOR"},
-			{MUL_OPERATOR, "MUL OPERATOR"},
-			{OPEN_PARENT, "OPEN PARENT"},
-			{CLOSE_PARENT, "CLOSE PARENT"},
-			{OPEN_BRACK, "OPEN BRACK"},
-			{CLOSE_BRACK, "CLOSE BRACK"},
-			{SEMICOLON, "SEMICOLON"},
-			{ASSIGNMENT, "ASSIGNMNET"},
-			{DEC_NUMBER, "DEC NUMBER"},
-			{HEX_NUMBER, "HEX NUMBER"},
-			{COMMA, "COMMA"},
-			{UNKNOWN, "UNKOWN"},
-			{END, "END"},
-			{IDENTIFIER, "IDENTIFIER"}
-	};
-
-	tokenToName = std::move(tokenMapTemp);
-
 	nextChar();
-}
-
-std::string Scanner::tokenToString(const Token &t) {
-	auto it = tokenToName.find(t.type);
-
-	if (tokenToName.end() == it)
-		return "";
-
-	return it->second;
 }
 
 bool Scanner::isKeyword(const int c) {
@@ -145,16 +110,6 @@ Token Scanner::getSeparatorToken(const int ch) {
 	return Token(UNKNOWN);
 }
 
-Token Scanner::getKeywordToken(const int ch) {
-	auto it  = keywordMap.find(std::string(1, ch));
-
-	nextChar();
-
-	if (it != keywordMap.end())
-		return Token(it->second);
-
-	return Token(UNKNOWN);
-}
 
 Token Scanner::getIdentifierToken(const std::string &word) {
 	auto it2 = keywordMap.find(word);
@@ -162,7 +117,7 @@ Token Scanner::getIdentifierToken(const std::string &word) {
 	if (it2 == keywordMap.end()) // not a keyword
 		return Token(IDENTIFIER, word);
 	else // a keyword
-		return Token(it2->second, word);
+		return Token(it2->second);
 }
 
 Token Scanner::getDecimalToken(const std::string &word) {

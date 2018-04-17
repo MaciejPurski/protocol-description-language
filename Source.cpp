@@ -3,7 +3,7 @@
 #include <iomanip>
 
 void Source::printLine() {
-	std::cout << lineBuffer << std::endl;
+	std::cout << std::endl << lineBuffer << std::endl << std::endl;
 }
 
 int Source::getIndex() {
@@ -11,27 +11,35 @@ int Source::getIndex() {
 }
 
 std::string Source::strToRed(const std::string &str) {
+#ifdef __unix__
 	return  std::string("\033[1;31m" + str + "\033[0m");
+#else
+	return str;
+#endif
 }
 
 std::string Source::strToWhite(const std::string &str) {
+#ifdef __unix__
 	return  std::string("\033[1;37m" + str + "\033[0m");
+#else
+	return str;
+#endif
 }
 
 void Source::raiseError(const std::string &errorDesc,
 			int begIndex, int midIndex, int endIndex) {
 	nErrors++;
 
-	std::cout << std::endl;
+	std::cerr << std::endl;
 
-	std::cout << strToWhite(fileName + ":" + std::to_string(linePosition + 1) + ":" + std::to_string(characterPosition + 1) + ": ")
+	std::cerr << strToWhite(fileName + ":" + std::to_string(linePosition) + ":" + std::to_string(characterPosition + 1) + ": ")
 	          << strToRed("error: ") << errorDesc << std::endl;
 
-	std::cout << lineBuffer.substr(0, begIndex) << strToRed(lineBuffer.substr(begIndex, endIndex - begIndex))
+	std::cerr << lineBuffer.substr(0, begIndex) << strToRed(lineBuffer.substr(begIndex, endIndex - begIndex))
 	<< lineBuffer.substr(endIndex) << std::endl;
 
 	for (int i = 0; i < begIndex; i++)
-		std::cout << " ";
+		std::cerr << " ";
 
 	std::string underline = "";
 
@@ -44,7 +52,7 @@ void Source::raiseError(const std::string &errorDesc,
 	for (int i = midIndex + 1; i < endIndex; i++)
 		underline += '~';
 
-	std::cout << strToRed(underline) << std::endl;
+	std::cerr << strToRed(underline) << std::endl;
 
 }
 
@@ -61,8 +69,9 @@ int Source::nextChar() {
 			// new line successfuly read
 			lineBuffer = temp;
 			linePosition++;
-			tokenBegin = 0;
 			characterPosition = -1;
+			if (testMode)
+				printLine();
 
 			return '\n';
 		}
@@ -73,13 +82,14 @@ int Source::nextChar() {
 	return lineBuffer[characterPosition];
 }
 
-Source::Source(const std::string &nFileName) {
+Source::Source(const std::string &nFileName, bool testMode = false) {
+	this->testMode = testMode;
 	fileName = nFileName;
 	nErrors = 0;
 	characterPosition = 0;
 	linePosition = 0;
 	lineBuffer = "";
-	tokenBegin = 0;
+
 	file.open(fileName, std::ios::in);
 
 	if (!file.is_open())
@@ -89,10 +99,6 @@ Source::Source(const std::string &nFileName) {
 Source::~Source() {
 	if (file.is_open())
 		file.close();
-}
-
-void Source::setTokenBegin() {
-	tokenBegin = characterPosition;
 }
 
 int Source::getNErrors() {
