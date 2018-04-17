@@ -4,6 +4,15 @@ Token Scanner::nextToken() {
 	while (isspace(ch))
 		nextChar(); // omit white spaces
 
+	// omit comments
+	if (ch == '#') {
+		while (ch != '\n')
+			nextChar();
+		while (isspace(ch))
+			nextChar();
+	}
+
+
 	if (ch == EOF) {
 		return Token(END);
 	}
@@ -22,7 +31,6 @@ Token Scanner::nextToken() {
 	// is a word
 	if (isalnum(ch)) {
 		std::string word;
-		src.setTokenBegin();
 
 		do {
 			word += ch;
@@ -201,7 +209,6 @@ Token Scanner::getHexadecimalToken(const std::string &word) {
 
 Token Scanner::getConstStringToken(const int c) {
 	std::string str;
-	src.setTokenBegin();
 
 	nextChar();
 
