@@ -12,6 +12,7 @@
 class Scanner {
 private:
 	Source &src;
+	int begIndex;
 	int ch; // current character
 	std::unordered_map<std::string, TokenType> keywordMap;
 	std::unordered_map<char, TokenType> separatorMap;

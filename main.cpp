@@ -19,6 +19,9 @@ int main(int argc, char *argv[]) {
 
 			Token t = s.nextToken();
 
+			//if (src.getIndex() == 0)
+			//	src.printLine();
+
 			while (t.type != END) {
 				std::cout << "TOKEN: " << s.tokenToString(t) << " " << t.stringValue << " " << t.intValue << std::endl;
 				t = s.nextToken();

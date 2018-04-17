@@ -2,6 +2,14 @@
 #include <exception>
 #include <iomanip>
 
+void Source::printLine() {
+	std::cout << lineBuffer << std::endl;
+}
+
+int Source::getIndex() {
+	return characterPosition;
+}
+
 std::string Source::strToRed(const std::string &str) {
 	return  std::string("\033[1;31m" + str + "\033[0m");
 }
@@ -10,23 +18,30 @@ std::string Source::strToWhite(const std::string &str) {
 	return  std::string("\033[1;37m" + str + "\033[0m");
 }
 
-void Source::raiseError(const std::string &token,
-			const std::string &errorDesc) {
+void Source::raiseError(const std::string &errorDesc,
+			int begIndex, int midIndex, int endIndex) {
 	nErrors++;
 
-	std::cout << "TOKEN: " << token << std::endl;
 	std::cout << std::endl;
+
 	std::cout << strToWhite(fileName + ":" + std::to_string(linePosition + 1) + ":" + std::to_string(characterPosition + 1) + ": ")
 	          << strToRed("error: ") << errorDesc << std::endl;
-	std::cout << lineBuffer.substr(0, tokenBegin) << strToRed(token)
-	<< lineBuffer.substr(tokenBegin + token.size()) << std::endl;
-	for (int i = 0; i < tokenBegin; i++)
+
+	std::cout << lineBuffer.substr(0, begIndex) << strToRed(lineBuffer.substr(begIndex, endIndex - begIndex))
+	<< lineBuffer.substr(endIndex) << std::endl;
+
+	for (int i = 0; i < begIndex; i++)
 		std::cout << " ";
 
-	std::string underline = "^";
+	std::string underline = "";
 
 
-	for (int i = tokenBegin; i < characterPosition - 1; i++)
+	for (int i = begIndex; i < midIndex; i++)
+		underline += '~';
+
+	underline += '^';
+
+	for (int i = midIndex + 1; i < endIndex; i++)
 		underline += '~';
 
 	std::cout << strToRed(underline) << std::endl;
