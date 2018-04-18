@@ -10,8 +10,8 @@ private:
 	std::fstream file;
 	bool testMode;
 
-	int characterPosition;
-	int linePosition;
+	unsigned int characterPosition;
+	unsigned int linePosition;
 	std::string lineBuffer;
 	int nErrors;
 	std::string strToRed(const std::string &str);

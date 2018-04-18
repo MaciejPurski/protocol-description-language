@@ -123,7 +123,7 @@ Token Scanner::getIdentifierToken(const std::string &word) {
 Token Scanner::getDecimalToken(const std::string &word) {
 	int value = 0;
 
-	for (int i = 0; i < word.size(); i++) {
+	for (unsigned int i = 0; i < word.size(); i++) {
 		if (!isdigit(word[i])) {
 			src.raiseError("Invalid integer suffix",
 					begIndex, begIndex, begIndex + word.size());
@@ -149,7 +149,7 @@ Token Scanner::getHexadecimalToken(const std::string &word) {
 
 	int value = 0;
 
-	for (int i = 2; i < word.size(); i++) {
+	for (unsigned int i = 2; i < word.size(); i++) {
 		if (!isHex(word[i])) {
 			src.raiseError("Invalid integer suffix",
 					begIndex, begIndex, begIndex + word.size());

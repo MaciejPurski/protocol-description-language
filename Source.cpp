@@ -3,7 +3,7 @@
 #include <iomanip>
 
 void Source::printLine() {
-	std::cout << std::endl << lineBuffer << std::endl << std::endl;
+	std::cout << lineBuffer << std::endl << std::endl;
 }
 
 int Source::getIndex() {
@@ -30,9 +30,12 @@ void Source::raiseError(const std::string &errorDesc,
 			int begIndex, int midIndex, int endIndex) {
 	nErrors++;
 
+	begIndex--;
+	midIndex--;
+	endIndex--;
 	std::cerr << std::endl;
 
-	std::cerr << strToWhite(fileName + ":" + std::to_string(linePosition) + ":" + std::to_string(characterPosition + 1) + ": ")
+	std::cerr << strToWhite(fileName + ":" + std::to_string(linePosition) + ":" + std::to_string(characterPosition) + ": ")
 	          << strToRed("error: ") << errorDesc << std::endl;
 
 	std::cerr << lineBuffer.substr(0, begIndex) << strToRed(lineBuffer.substr(begIndex, endIndex - begIndex))
@@ -41,7 +44,7 @@ void Source::raiseError(const std::string &errorDesc,
 	for (int i = 0; i < begIndex; i++)
 		std::cerr << " ";
 
-	std::string underline = "";
+	std::string underline;
 
 
 	for (int i = begIndex; i < midIndex; i++)
@@ -57,29 +60,22 @@ void Source::raiseError(const std::string &errorDesc,
 }
 
 int Source::nextChar() {
-	characterPosition++;
-
 	// read a line to the buffer if necessary
-	if (characterPosition > lineBuffer.size()) {
-		std::string temp;
+	if (characterPosition >= lineBuffer.size()) {
 
-		if (!std::getline(file, temp)) {
+		if (!std::getline(file, lineBuffer)) {
 			return EOF;
 		} else {
 			// new line successfuly read
-			lineBuffer = temp;
+			lineBuffer += '\n';
 			linePosition++;
-			characterPosition = -1;
+			characterPosition = 0;
 			if (testMode)
 				printLine();
-
-			return '\n';
 		}
-	} else if (characterPosition == lineBuffer.size()) {
-		return '\n';
 	}
 
-	return lineBuffer[characterPosition];
+	return lineBuffer[characterPosition++];
 }
 
 Source::Source(const std::string &nFileName, bool testMode = false) {

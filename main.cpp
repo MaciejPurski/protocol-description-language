@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[]) {
 	if (argc != 3) {
-		std::cout << "Wrong arguments number\n";
+		std::cout << "Usage: ./TKOM --lexer-test <file>\n";
 		std::cout << argv[0] << std::endl;
 		std::cout << argv[1] << std::endl;
 		std::cout << argv[2] << std::endl;
