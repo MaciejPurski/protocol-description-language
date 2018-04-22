@@ -1,4 +1,5 @@
 #include "Source.h"
+#include "Token.h"
 #include <exception>
 #include <iomanip>
 
@@ -26,33 +27,30 @@ std::string Source::strToWhite(const std::string &str) {
 #endif
 }
 
-void Source::raiseError(const std::string &errorDesc,
-			int begIndex, int midIndex, int endIndex) {
+void Source::raiseError(const std::string &errorDesc, Token &token) {
 	nErrors++;
 
-	begIndex--;
-	midIndex--;
-	endIndex--;
 	std::cerr << std::endl;
 
 	std::cerr << strToWhite(fileName + ":" + std::to_string(linePosition) + ":" + std::to_string(characterPosition) + ": ")
 	          << strToRed("error: ") << errorDesc << std::endl;
 
-	std::cerr << lineBuffer.substr(0, begIndex) << strToRed(lineBuffer.substr(begIndex, endIndex - begIndex))
-	<< lineBuffer.substr(endIndex) << std::endl;
+	std::cerr << lineBuffer.substr(0, token.position - 1) << strToRed(lineBuffer.substr(token.position - 1, token.length))
+	<< lineBuffer.substr(token.position - 1 + token.length) << std::endl;
 
-	for (int i = 0; i < begIndex; i++)
-		std::cerr << " ";
+	for (int i = 0; i < token.position - 1; i++) {
+		if (lineBuffer[i] == '\t')
+			std::cerr << "\t";
+		else
+			std::cerr << " ";
+	}
+
 
 	std::string underline;
 
-
-	for (int i = begIndex; i < midIndex; i++)
-		underline += '~';
-
 	underline += '^';
 
-	for (int i = midIndex + 1; i < endIndex; i++)
+	for (int i = 0; i < token.length -1; i++)
 		underline += '~';
 
 	std::cerr << strToRed(underline) << std::endl;

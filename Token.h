@@ -12,9 +12,13 @@ struct Token {
 	TokenType type;
 	std::string stringValue;
 	int intValue;
+	int position;
+	int length;
 
-	explicit Token(TokenType nType, std::string str = "", int nValue = 0) : type(nType), stringValue(str), intValue(nValue) {
-	}
+	explicit Token(TokenType nType, int nposition, int nlength, std::string str = "", int nValue = 0) :
+			position(nposition), length(nlength), type(nType), stringValue(str), intValue(nValue)  {}
+
+	Token() {}
 };
 
 #endif //TKOM_TOKEN_H

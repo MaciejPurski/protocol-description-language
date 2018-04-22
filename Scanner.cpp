@@ -12,12 +12,11 @@ Token Scanner::nextToken() {
 			nextChar();
 	}
 
+	begIndex = src.getIndex();
 
 	if (ch == EOF) {
-		return Token(END);
+		return Token(END, begIndex, 1);
 	}
-
-	begIndex = src.getIndex();
 
 	if (isSeparator(ch)) {
 		return getSeparatorToken(ch);
@@ -47,10 +46,12 @@ Token Scanner::nextToken() {
 		return getDecimalToken(word);
 	}
 
-	src.raiseError("Unknown token", begIndex, begIndex, begIndex + 1);
+	Token t(UNKNOWN, begIndex, 1);
+
+	src.raiseError("Unknown token", t);
 	nextChar();
 
-	return Token(UNKNOWN);
+	return t;
 }
 
 Scanner::Scanner(Source &s) : src(s) {
@@ -105,9 +106,9 @@ Token Scanner::getSeparatorToken(const int ch) {
 	nextChar();
 
 	if (it != separatorMap.end())
-		return Token(it->second);
+		return Token(it->second, begIndex, 1);
 
-	return Token(UNKNOWN);
+	return Token(UNKNOWN, begIndex, 1);
 }
 
 
@@ -115,9 +116,9 @@ Token Scanner::getIdentifierToken(const std::string &word) {
 	auto it2 = keywordMap.find(word);
 
 	if (it2 == keywordMap.end()) // not a keyword
-		return Token(IDENTIFIER, word);
+		return Token(IDENTIFIER, begIndex, word.size(), word);
 	else // a keyword
-		return Token(it2->second);
+		return Token(it2->second, begIndex, word.size());
 }
 
 Token Scanner::getDecimalToken(const std::string &word) {
@@ -125,41 +126,47 @@ Token Scanner::getDecimalToken(const std::string &word) {
 
 	for (unsigned int i = 0; i < word.size(); i++) {
 		if (!isdigit(word[i])) {
-			src.raiseError("Invalid integer suffix",
-					begIndex, begIndex, begIndex + word.size());
-			return Token(UNKNOWN);
+			Token t(UNKNOWN, begIndex, word.size());
+
+			src.raiseError("Invalid integer suffix", t);
+
+			return t;
 		}
 
 		value = value * 10 + word[i] - '0';
 	}
 
-	return Token(DEC_NUMBER, "", value);
+	return Token(DEC_NUMBER, begIndex, word.size(), "", value);
 }
 
 Token Scanner::getHexadecimalToken(const std::string &word) {
 	if (word.size() == 1 || word[1] != 'x') {
 		// decimal value 0
 		if (word.size() == 1)
-			return Token(DEC_NUMBER, "", 0);
+			return Token(DEC_NUMBER, begIndex, word.size(), "", 0);
 
-		src.raiseError("Invalid integer suffix",
-				begIndex, begIndex, begIndex + word.size());
-		return Token(UNKNOWN);
+		Token t(UNKNOWN, begIndex, word.size());
+
+		src.raiseError("Invalid integer suffix", t);
+
+		return t;
 	}
 
 	int value = 0;
 
 	for (unsigned int i = 2; i < word.size(); i++) {
 		if (!isHex(word[i])) {
-			src.raiseError("Invalid integer suffix",
-					begIndex, begIndex, begIndex + word.size());
-			return Token(UNKNOWN);
+			Token t(UNKNOWN, begIndex, word.size());
+
+			src.raiseError("Invalid integer suffix", t);
+
+			return t;
 		}
 
 		value = (value << 4) + toHex(word[i]);
 	}
 
-	return Token(HEX_NUMBER, "", value);
+	return Token(HEX_NUMBER, begIndex, word.size(), "", value);
 }
 
 Token Scanner::getConstStringToken(const int c) {
@@ -173,14 +180,14 @@ Token Scanner::getConstStringToken(const int c) {
 	}
 
 	if (ch == EOF) {
-		src.raiseError("Quotation not closed",
-				begIndex, begIndex, begIndex + str.size());
-		return Token(UNKNOWN);
+		Token t(UNKNOWN, begIndex, str.size() + 1);
+		src.raiseError("Quotation not closed", t);
+		return Token();
 	}
 
 	nextChar();
 
-	return Token(STRING_TYPE, str);
+	return Token(STRING_TYPE, begIndex, str.size(), str);
 }
 
 bool Scanner::isHex(const int c) {

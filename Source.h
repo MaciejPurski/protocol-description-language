@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <fstream>
+#include "Token.h"
 
 class Source {
 private:
@@ -21,8 +22,7 @@ private:
 public:
 	explicit Source(const std::string &fileName, bool testMode);
 	~Source();
-	void raiseError(const std::string &errorDesc,
-			int begIndex, int midIndex, int endIndex);
+	void raiseError(const std::string &errorDesc, Token &token);
 	int nextChar();
 	int getNErrors();
 	void printLine();
