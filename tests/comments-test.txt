@@ -1,0 +1,10 @@
+abc #to jest komentarz
+sadsad
+###
+sadad
+#
+sadasd
+#
+asdsad
+#asasdsdas
+1234

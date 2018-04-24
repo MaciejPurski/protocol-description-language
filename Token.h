@@ -11,11 +11,11 @@ enum TokenType {
 struct Token {
 	TokenType type;
 	std::string stringValue;
-	int intValue;
-	int position;
-	int length;
+	unsigned int intValue;
+	unsigned int position;
+	unsigned int length;
 
-	explicit Token(TokenType nType, int nposition, int nlength, std::string str = "", int nValue = 0) :
+	explicit Token(TokenType nType, unsigned int nposition, unsigned int nlength, std::string str = "", unsigned int nValue = 0) :
 			position(nposition), length(nlength), type(nType), stringValue(str), intValue(nValue)  {}
 
 	Token() {}

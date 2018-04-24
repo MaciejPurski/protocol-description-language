@@ -120,7 +120,45 @@ std::shared_ptr<Sequence> Parser::parseProtocol() {
 }
 
 std::shared_ptr<Packet> Parser::parsePacket() {
-	return nullptr;
+    std::string name;
+    std::vector<std::shared_ptr<Field>> fields;
+    std::shared_ptr<Field> f;
+
+    // packet must begin with a "packet" keyword
+    if (token.type != PACKET_KEYWORD)
+        return nullptr;
+
+	std::cout << "parse packet" << std::endl;
+
+    nextToken();
+    if (token.type != IDENTIFIER) {
+        src.raiseError("Expected packet name identifier", token);
+
+        return nullptr;
+    }
+
+    name = token.stringValue;
+    nextToken();
+
+    if (token.type != OPEN_BRACK) {
+	    src.raiseError("Expected '{' after packet declaration", token);
+
+	    return nullptr;
+    }
+    nextToken();
+
+	while ((f = parseField()) != nullptr)
+		fields.push_back(f);
+
+	if (token.type != CLOSE_BRACK) {
+		src.raiseError("Expected '}' after packet declaration", token);
+
+		return nullptr;
+	}
+	nextToken();
+
+
+    return std::make_shared<Packet>(name, fields);
 }
 
 std::shared_ptr<Operation> Parser::parseOperation() {
@@ -282,5 +320,144 @@ std::shared_ptr<RepeatOperation> Parser::parseSimpleRepeatOperation() {
 }
 
 std::shared_ptr<RepeatOperation> Parser::parseCompoundRepeatOperation() {
-	return std::shared_ptr<RepeatOperation>();
+	unsigned int repeatFrom;
+	unsigned int repeatTo;
+	bool readFrom = false;
+	bool commaSeperated = false;
+	bool readTo = false;
+
+	if (token.type != REPEAT_KEYWORD)
+		return nullptr;
+	nextToken();
+
+	if (token.type != OPEN_PARENT) {
+		src.raiseError("Expected '(' after 'repeat' keyword", token);
+		return nullptr;
+	}
+	nextToken();
+
+	if (token.type == DEC_NUMBER) {
+		readFrom = true;
+		repeatFrom = token.intValue;
+		nextToken();
+	} else {
+	    repeatFrom = 0;
+	}
+
+	if (token.type == COMMA) {
+	    commaSeperated = true;
+		nextToken();
+	}
+
+	if (token.type == DEC_NUMBER) {
+		repeatTo = token.intValue;
+		nextToken();
+	} else if (commaSeperated || !readFrom) {
+	    repeatTo = UINT_MAX;
+	} else {
+	    repeatTo = repeatFrom;
+	}
+
+	if (token.type == CLOSE_PARENT) {
+	    nextToken();
+	} else {
+		src.raiseError("Expected decimal number or ',' or ')' in repeat operation", token);
+		return nullptr;
+	}
+
+    std::shared_ptr<Block> b;
+
+    if ((b = parseBlock()) == nullptr) {
+        src.raiseError("Expected block after \'" + token.stringValue + "\'" + " keyword", token);
+        return nullptr;
+    }
+
+    return std::make_shared<RepeatOperation>(repeatFrom, repeatTo, b);
+}
+
+std::shared_ptr<Field> Parser::parseField() {
+	std::shared_ptr<Type> type;
+	std::string name;
+	bool isAssigned = false;
+	unsigned int valueAssigned;
+
+	if ((type = parseType()) == nullptr) {
+		return nullptr;
+	}
+
+	if (token.type != IDENTIFIER) {
+		src.raiseError("Expected field name after type declaration", token);
+		return nullptr;
+	}
+	nextToken();
+
+	// there is a value assigned to the field
+	if (token.type == ASSIGNMENT) {
+		nextToken();
+		isAssigned = true;
+
+		if (token.type != DEC_NUMBER && token.type != HEX_NUMBER) {
+			src.raiseError("Expected rvalue after assignment", token);
+			return nullptr;
+		}
+
+		valueAssigned = token.intValue;
+		nextToken();
+	}
+
+	if (token.type != SEMICOLON) {
+		src.raiseError("Expected ';' after type declaration", token);
+		return nullptr;
+	}
+	nextToken();
+
+	return std::make_shared<Field>(type, name, isAssigned, valueAssigned);
+}
+
+std::shared_ptr<Type> Parser::parseType() {
+	TokenType type;
+	std::shared_ptr<Expression> length;
+
+	if (token.type != INT_TYPE && token.type != UINT_TYPE && token.type != BYTES_TYPE &&
+			token.type != BITS_TYPE && token.type != STRING_TYPE)
+		return nullptr;
+
+	type = token.type;
+
+	nextToken();
+
+	if ((length = parseExpression()) == nullptr) {
+		src.raiseError("Expected type length", token);
+		return nullptr;
+	}
+
+	std::cout << "parse type\n";
+
+
+	return std::make_shared<Type>(type, length);
+}
+
+std::shared_ptr<Expression> Parser::parseExpression() {
+	unsigned int value;
+
+	if (token.type != OPEN_PARENT)
+		return nullptr;
+
+	nextToken();
+
+	if (token.type != DEC_NUMBER) {
+		src.raiseError("Expected decimal number", token);
+		return nullptr;
+	}
+	value = token.intValue;
+	nextToken();
+
+	if (token.type != CLOSE_PARENT) {
+		src.raiseError("Expected closing parenthesis", token);
+		return nullptr;
+	}
+
+	nextToken();
+
+	return std::make_shared<Expression>(value);
 }

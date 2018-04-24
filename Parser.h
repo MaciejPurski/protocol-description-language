@@ -48,6 +48,12 @@ public:
 	std::shared_ptr<RepeatOperation> parseSimpleRepeatOperation();
 
 	std::shared_ptr<RepeatOperation> parseCompoundRepeatOperation();
+
+	std::shared_ptr<Field> parseField();
+
+	std::shared_ptr<Type> parseType();
+
+	std::shared_ptr<Expression> parseExpression();
 };
 
 
