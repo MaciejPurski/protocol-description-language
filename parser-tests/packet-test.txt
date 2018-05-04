@@ -1,0 +1,8 @@
+packet ACK {
+	int(4) abc;
+	bytes(1) pid = 0x01;
+}
+
+protocol iot {
+	ACK;
+}

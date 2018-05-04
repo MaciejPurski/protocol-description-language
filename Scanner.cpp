@@ -1,3 +1,4 @@
+#include <vector>
 #include "Scanner.h"
 
 Token Scanner::nextToken() {
@@ -202,4 +203,15 @@ int Scanner::toHex(const int c) {
 		return c - 'a' + 10;
 
 	return -1;
+}
+
+std::string Scanner::tokenToString(TokenType t) {
+	static std::vector<std::string> arr = {
+			"packet", "sequence", "protocol", "iterate", "do_iterate", "alt", "or", "opt", "repeat",
+			"int", "uint", "bytes", "string", "bits", "+",
+			"-", "*", "(", ")", "{", "}",
+			";", "=", "decimal number", "hexadecimal number", ",", "END", "UNKNOWN", "identifier"
+	};
+
+	return arr[t];
 }

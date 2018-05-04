@@ -1,0 +1,4 @@
+sequence a {
+	a();
+	b;
+}

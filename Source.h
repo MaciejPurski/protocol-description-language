@@ -15,9 +15,6 @@ private:
 	unsigned int linePosition;
 	std::string lineBuffer;
 	int nErrors;
-	std::string strToRed(const std::string &str);
-	std::string strToWhite(const std::string &str);
-
 
 public:
 	explicit Source(const std::string &fileName, bool testMode);
@@ -27,6 +24,8 @@ public:
 	int getNErrors();
 	void printLine();
 	int getIndex();
+	static std::string strToRed(const std::string &str);
+	static std::string strToWhite(const std::string &str);
 };
 
 

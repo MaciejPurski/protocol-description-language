@@ -3,8 +3,9 @@
 
 #include <iostream>
 #include "Operation.h"
+#include "Reference.h"
 
-class SequenceReference : public Operation {
+class SequenceReference : public Reference {
 public:
 	int call() {
 

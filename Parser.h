@@ -20,10 +20,7 @@ private:
 		token = s.nextToken();
 	}
 
-public:
-	Parser(Scanner &ns, Source &nsrc) : s(ns), src(nsrc) {}
-
-	std::shared_ptr<Protocol>  parse();
+	bool consume(bool isPermissive, TokenType expected);
 
 	std::shared_ptr<Packet> parsePacket();
 
@@ -35,7 +32,7 @@ public:
 
 	std::shared_ptr<Operation> parseOperation();
 
-	std::shared_ptr<Operation> parseReference();
+	std::shared_ptr<Reference> parseReference();
 
 	std::shared_ptr<RepeatOperation> parseRepeatOperation();
 
@@ -54,6 +51,19 @@ public:
 	std::shared_ptr<Type> parseType();
 
 	std::shared_ptr<Expression> parseExpression();
+
+public:
+	Parser(Scanner &ns, Source &nsrc) : s(ns), src(nsrc) {
+		nextToken();
+	}
+
+	std::shared_ptr<Protocol>  parse();
+
+	std::string consumeIdentifier(bool isPermissive);
+
+	unsigned int consumeNumber(bool isPermissive);
+
+	bool consumeNumber(bool isPermissive, unsigned int *number);
 };
 
 

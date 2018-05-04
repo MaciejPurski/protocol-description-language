@@ -23,7 +23,6 @@ private:
 	bool isSeparator(const int c);
 	bool isHex(const int c);
 	int toHex(const int c);
-	Token getKeywordToken(const int c);
 	Token getSeparatorToken(const int c);
 	Token getIdentifierToken(const std::string &word);
 	Token getDecimalToken(const std::string &word);
@@ -38,7 +37,7 @@ private:
 public:
 	explicit Scanner(Source &s);
 	Token nextToken();
-	std::string tokenToString(const Token &t);
+	static std::string tokenToString(TokenType t);
 };
 
 

@@ -1,6 +1,7 @@
 #include <memory>
 #include <bits/shared_ptr.h>
 #include <climits>
+#include <cstdarg>
 #include "Parser.h"
 #include "Sequence.h"
 #include "RepeatOperation.h"
@@ -13,30 +14,22 @@ std::shared_ptr<Protocol> Parser::parse() {
 	std::shared_ptr<Packet> p;
 	std::shared_ptr<Sequence> s;
 
-	nextToken();
-
 	/* Protocol might consist of packets and sequences,
 	 * therefore we try to parse them until it is possible
 	 */
 	do {
-		p = parsePacket();
-		if (p != nullptr)
+		if ((p = parsePacket()) != nullptr)
 			packets.push_back(p);
 
-		s = parseSequence();
-		if (s != nullptr)
+		if ((s = parseSequence()) != nullptr)
 			sequences.push_back(s);
 
-	} while (p != nullptr || s != nullptr);
+		if ((s = parseProtocol()) != nullptr)
+			protocol = s;
 
-	/*
-	 * At the end there should be "protocol" definition
-	 */
-	if ((protocol = parseProtocol()) == nullptr) {
-		src.raiseError("Expected protocol definition at the end of file", token);
+	} while ((p != nullptr) || (s != nullptr));
 
-		return nullptr;
-	}
+	// TODO: nothing recognized
 
 	return std::make_shared<Protocol>(packets, sequences, protocol);
 }
@@ -46,25 +39,19 @@ std::shared_ptr<Sequence> Parser::parseSequence() {
 	std::vector<std::shared_ptr<Operation>> operations;
 
 	// sequence must begin with a "sequence" keyword
-	if (token.type != SEQUENCE_KEYWORD)
+	if (!consume(true, SEQUENCE_KEYWORD))
 		return nullptr;
 
-	nextToken();
-	if (token.type != IDENTIFIER) {
-		src.raiseError("Expected sequence name identifier", token);
-
+	if ((name = consumeIdentifier(false)).empty())
 		return nullptr;
-	}
 
-	name = token.stringValue;
+	if (!consume(false, OPEN_BRACK))
+		return nullptr;
 
-	nextToken();
 	std::shared_ptr<Block> block = parseBlock();
 
-	if (block == nullptr) {
-		src.raiseError("Expected block definition", token);
+	if (block == nullptr)
 		return nullptr;
-	}
 
 	return std::make_shared<Sequence>(name, block);
 }
@@ -73,20 +60,12 @@ std::shared_ptr<Block> Parser::parseBlock() {
 	std::vector<std::shared_ptr<Operation>> operations;
 	std::shared_ptr<Operation> o;
 
-	if (token.type != OPEN_BRACK) {
-		return nullptr;
-	}
-
-	nextToken();
-
 	while ((o = parseOperation()) != nullptr)
 		operations.push_back(o);
 
-	if (token.type != CLOSE_BRACK) {
-		src.raiseError("Expected closing bracket", token);
+	if (!consume(false, CLOSE_BRACK))
 		return nullptr;
-	}
-	nextToken();
+
 
 	return std::make_shared<Block>(operations);
 }
@@ -96,25 +75,19 @@ std::shared_ptr<Sequence> Parser::parseProtocol() {
 	std::vector<std::shared_ptr<Operation>> operations;
 
 	// sequence must begin with a "sequence" keyword
-	if (token.type != PROTOCOL_KEYWORD)
+	if (!consume(true, PROTOCOL_KEYWORD))
 		return nullptr;
 
-	nextToken();
-	if (token.type != IDENTIFIER) {
-		src.raiseError("Expected protocol name identifier", token);
-
+	if ((name = consumeIdentifier(false)).empty())
 		return nullptr;
-	}
 
-	name = token.stringValue;
+	if (!consume(false, OPEN_BRACK))
+		return nullptr;
 
-	nextToken();
 	std::shared_ptr<Block> block = parseBlock();
 
-	if (block == nullptr) {
-		src.raiseError("Expected block definition", token);
+	if (block == nullptr)
 		return nullptr;
-	}
 
 	return std::make_shared<Sequence>(name, block);
 }
@@ -125,38 +98,20 @@ std::shared_ptr<Packet> Parser::parsePacket() {
     std::shared_ptr<Field> f;
 
     // packet must begin with a "packet" keyword
-    if (token.type != PACKET_KEYWORD)
-        return nullptr;
-
-	std::cout << "parse packet" << std::endl;
-
-    nextToken();
-    if (token.type != IDENTIFIER) {
-        src.raiseError("Expected packet name identifier", token);
-
-        return nullptr;
-    }
-
-    name = token.stringValue;
-    nextToken();
-
-    if (token.type != OPEN_BRACK) {
-	    src.raiseError("Expected '{' after packet declaration", token);
-
+    if (!consume(true, PACKET_KEYWORD))
 	    return nullptr;
-    }
-    nextToken();
+
+	if ((name = consumeIdentifier(false)).empty())
+		return nullptr;
+
+	if (!consume(false, OPEN_BRACK))
+		return nullptr;
 
 	while ((f = parseField()) != nullptr)
 		fields.push_back(f);
 
-	if (token.type != CLOSE_BRACK) {
-		src.raiseError("Expected '}' after packet declaration", token);
-
+	if (!consume(false, CLOSE_BRACK))
 		return nullptr;
-	}
-	nextToken();
-
 
     return std::make_shared<Packet>(name, fields);
 }
@@ -180,33 +135,24 @@ std::shared_ptr<Operation> Parser::parseOperation() {
  * A reference might be either a reference to a packet
  * or a sequence
  */
-std::shared_ptr<Operation> Parser::parseReference() {
-	std::shared_ptr<Operation> ref;
+std::shared_ptr<Reference> Parser::parseReference() {
+	std::shared_ptr<Reference> ref;
 	std::string name;
 
-	if (token.type != IDENTIFIER)
+	if ((name = consumeIdentifier(true)).empty())
 		return nullptr;
 
-	name = token.stringValue;
-	nextToken();
+	ref = parseSequenceReference();
 
-	if ((ref = parsePacketReference()) != nullptr) {
-		auto p = std::static_pointer_cast<PacketReference>(ref);
+	if (ref == nullptr)
+		ref = std::make_shared<PacketReference>();
 
-		p->name = name;
-		return p;
-	}
+	ref->name = name;
 
-	if ((ref = parseSequenceReference()) != nullptr) {
-		auto s = std::static_pointer_cast<SequenceReference>(ref);
+	if (!consume(false, SEMICOLON))
+		return nullptr;
 
-		s->name = name;
-		return s;
-	}
-
-	src.raiseError("Expected \'(\' token or \';\' to parse a reference", token);
-
-	return nullptr;
+	return ref;
 }
 
 
@@ -226,61 +172,39 @@ std::shared_ptr<AltOperation> Parser::parseAltOperation() {
 	std::vector<std::shared_ptr<Block>> blocks;
 	std::shared_ptr<Block> b;
 
-	if (token.type != ALT_KEYWORD)
+	if (!consume(true, ALT_KEYWORD))
 		return nullptr;
-	nextToken();
 
-	b = parseBlock();
-	if (b == nullptr) {
-		src.raiseError("Expected block after \'alt\' keyword", token);
+	if (!consume(false, OPEN_BRACK))
 		return nullptr;
-	}
+
+	if ((b = parseBlock()) == nullptr)
+		return nullptr;
+
 	blocks.push_back(b);
 
-	if (token.type != OR_KEYWORD) {
-		src.raiseError("Expected at least one 'or' statement after 'alt' block", token);
+	if (!consume(false, OR_KEYWORD))
 		return nullptr;
-	}
 
 	do  {
-		nextToken();
-		b = parseBlock();
-		if (b == nullptr) {
-			src.raiseError("Expected block after \'or\' keyword", token);
+		if (!consume(false, OPEN_BRACK))
 			return nullptr;
-		}
+
+		if ((b = parseBlock()) == nullptr)
+			return nullptr;
 
 		blocks.push_back(b);
-
-	} while (token.type == OR_KEYWORD);
+	} while (consume(true, OR_KEYWORD));
 
 	return std::make_shared<AltOperation>(blocks);
 }
 
-std::shared_ptr<PacketReference> Parser::parsePacketReference() {
-	if (token.type != SEMICOLON)
-		return nullptr;
-
-	nextToken();
-
-	return std::make_shared<PacketReference>();
-}
-
 std::shared_ptr<SequenceReference> Parser::parseSequenceReference() {
-	if (token.type != OPEN_PARENT)
+	if (!consume(true, OPEN_PARENT))
 		return nullptr;
 
-	nextToken();
-
-	if (token.type != CLOSE_PARENT)
+	if (!consume(false, CLOSE_PARENT))
 		return nullptr;
-
-	nextToken();
-
-	if (token.type != SEMICOLON)
-		return nullptr;
-
-	nextToken();
 
 	return std::make_shared<SequenceReference>();
 }
@@ -289,32 +213,26 @@ std::shared_ptr<RepeatOperation> Parser::parseSimpleRepeatOperation() {
 	unsigned int repeatFrom;
 	unsigned int repeatTo;
 
-	if (token.type == ITERATE_KEYWORD) {
+	if (consume(true, ITERATE_KEYWORD)) {
 		repeatFrom = 0;
 		repeatTo = UINT_MAX;
-
-		nextToken();
-	} else if (token.type == DOITERATE_KEYWORD) {
+	} else if (consume(true, DOITERATE_KEYWORD)) {
 		repeatFrom = 1;
 		repeatTo = UINT_MAX;
-
-		nextToken();
-	} else if (token.type == OPT_KEYWORD) {
+	} else if (consume(true, OPT_KEYWORD)) {
 		repeatFrom = 0;
 		repeatTo = 1;
-
-		nextToken();
 	} else {
 		return nullptr;
 	}
 
 	std::shared_ptr<Block> b;
 
-	if ((b = parseBlock()) == nullptr) {
-		src.raiseError("Expected block after \'" + token.stringValue + "\'" + " keyword", token);
+	if (!consume(false, OPEN_BRACK))
 		return nullptr;
-	}
 
+	if ((b = parseBlock()) == nullptr)
+		return nullptr;
 
 	return std::make_shared<RepeatOperation>(repeatFrom, repeatTo, b);
 }
@@ -326,49 +244,42 @@ std::shared_ptr<RepeatOperation> Parser::parseCompoundRepeatOperation() {
 	bool commaSeperated = false;
 	bool readTo = false;
 
-	if (token.type != REPEAT_KEYWORD)
+	if (!consume(true, REPEAT_KEYWORD))
 		return nullptr;
-	nextToken();
 
-	if (token.type != OPEN_PARENT) {
-		src.raiseError("Expected '(' after 'repeat' keyword", token);
+	if (!consume(false, OPEN_PARENT))
 		return nullptr;
-	}
-	nextToken();
 
-	if (token.type == DEC_NUMBER) {
+	if (consumeNumber(true, &repeatFrom)) {
 		readFrom = true;
-		repeatFrom = token.intValue;
-		nextToken();
 	} else {
 	    repeatFrom = 0;
 	}
 
-	if (token.type == COMMA) {
+	// if there is a comma, we might try to consume a second number
+	if (consume(true, COMMA)) {
 	    commaSeperated = true;
-		nextToken();
+
+	    // if there is no second number after a comma
+	    if (!consumeNumber(true, &repeatTo))
+	    	repeatTo = UINT_MAX;
+	} else if (!readFrom) {
+		// () - case
+		repeatTo = UINT_MAX;
+	} else {
+		// (3) - case
+		repeatTo = repeatFrom;
 	}
 
-	if (token.type == DEC_NUMBER) {
-		repeatTo = token.intValue;
-		nextToken();
-	} else if (commaSeperated || !readFrom) {
-	    repeatTo = UINT_MAX;
-	} else {
-	    repeatTo = repeatFrom;
-	}
-
-	if (token.type == CLOSE_PARENT) {
-	    nextToken();
-	} else {
-		src.raiseError("Expected decimal number or ',' or ')' in repeat operation", token);
+	if (!consume(false, CLOSE_PARENT))
 		return nullptr;
-	}
 
     std::shared_ptr<Block> b;
 
+    if (!consume(false, OPEN_BRACK))
+    	return nullptr;
+
     if ((b = parseBlock()) == nullptr) {
-        src.raiseError("Expected block after \'" + token.stringValue + "\'" + " keyword", token);
         return nullptr;
     }
 
@@ -381,35 +292,22 @@ std::shared_ptr<Field> Parser::parseField() {
 	bool isAssigned = false;
 	unsigned int valueAssigned;
 
-	if ((type = parseType()) == nullptr) {
+	if ((type = parseType()) == nullptr)
 		return nullptr;
-	}
 
-	if (token.type != IDENTIFIER) {
-		src.raiseError("Expected field name after type declaration", token);
+	if ((name = consumeIdentifier(false)).empty())
 		return nullptr;
-	}
-	nextToken();
 
 	// there is a value assigned to the field
-	if (token.type == ASSIGNMENT) {
-		nextToken();
+	if (consume(true, ASSIGNMENT)) {
 		isAssigned = true;
 
-		if (token.type != DEC_NUMBER && token.type != HEX_NUMBER) {
-			src.raiseError("Expected rvalue after assignment", token);
+		if (!consumeNumber(false, &valueAssigned))
 			return nullptr;
-		}
-
-		valueAssigned = token.intValue;
-		nextToken();
 	}
 
-	if (token.type != SEMICOLON) {
-		src.raiseError("Expected ';' after type declaration", token);
+	if (!consume(false, SEMICOLON))
 		return nullptr;
-	}
-	nextToken();
 
 	return std::make_shared<Field>(type, name, isAssigned, valueAssigned);
 }
@@ -418,8 +316,7 @@ std::shared_ptr<Type> Parser::parseType() {
 	TokenType type;
 	std::shared_ptr<Expression> length;
 
-	if (token.type != INT_TYPE && token.type != UINT_TYPE && token.type != BYTES_TYPE &&
-			token.type != BITS_TYPE && token.type != STRING_TYPE)
+	if ()
 		return nullptr;
 
 	type = token.type;
@@ -460,4 +357,62 @@ std::shared_ptr<Expression> Parser::parseExpression() {
 	nextToken();
 
 	return std::make_shared<Expression>(value);
+}
+
+bool Parser::consume(bool isPermissive, TokenType expected) {
+	if (token.type == expected) {
+		nextToken();
+
+		return true;
+	}
+
+	// report an error
+	if (!isPermissive) {
+		src.raiseError("Expected " + Source::strToWhite("'" + Scanner::tokenToString(expected) + "'") + " before " +
+		               Source::strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
+
+		nextToken();
+	}
+
+	return false;
+}
+
+std::string Parser::consumeIdentifier(bool isPermissive) {
+	std::string str = "";
+
+	if (token.type == IDENTIFIER) {
+		str = token.stringValue;
+		nextToken();
+	} else if (!isPermissive) {
+		src.raiseError("Expected identifier before " +
+		               Source::strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
+
+		nextToken();
+	}
+
+
+	return str;
+}
+
+bool Parser::consumeNumber(bool isPermissive, unsigned int *number) {
+	if (token.type == DEC_NUMBER || token.type == HEX_NUMBER) {
+		*number = token.intValue;
+		nextToken();
+
+		return true;
+	}
+
+	if (!isPermissive) {
+		src.raiseError("Expected identifier before " +
+		               Source::strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
+
+		nextToken();
+	}
+
+	return false;
+}
+
+TokenType Parser::consumeType(bool isPermissive) {
+	if (!consume(true, INT_TYPE) && !consume(true, UINT_TYPE) && !consume(true, BYTES_TYPE) &&
+	    !consume(true, BITS_TYPE) && !consume(true, STRING_TYPE))
 }

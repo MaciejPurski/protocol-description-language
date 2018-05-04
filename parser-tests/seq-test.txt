@@ -1,0 +1,20 @@
+sequence a {
+	a();
+	b;
+	iterate {
+		d;
+	}
+
+	do_iterate {
+		opt {
+			e();
+		}
+
+		f();
+	}
+
+}
+
+protocol iot {
+	a();
+}

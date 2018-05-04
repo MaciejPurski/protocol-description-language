@@ -10,5 +10,6 @@ void Protocol::traverseParseTree(int level) {
 	for (auto s : sequences)
 		s->traverseParseTree(level + 1);
 
+	if (protocol != nullptr)
 		protocol->traverseParseTree(level + 1);
 }

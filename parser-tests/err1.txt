@@ -1,0 +1,8 @@
+sequence abc {
+	@
+
+	o = 10;
+	opt {
+
+	abc();
+}

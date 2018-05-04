@@ -3,9 +3,10 @@
 
 
 #include "Operation.h"
+#include "Reference.h"
 #include <iostream>
 
-class PacketReference : public Operation {
+class PacketReference : public Reference {
 public:
 	int call() {
 
