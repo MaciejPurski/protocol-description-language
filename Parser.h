@@ -3,12 +3,13 @@
 
 
 #include "Scanner.h"
-#include "Protocol.h"
-#include "Sequence.h"
-#include "RepeatOperation.h"
-#include "AltOperation.h"
-#include "PacketReference.h"
-#include "SequenceReference.h"
+#include "Nodes/AltOperation.h"
+#include "Nodes/SequenceReference.h"
+#include "Nodes/Packet.h"
+#include "Nodes/Sequence.h"
+#include "Nodes/Reference.h"
+#include "Nodes/RepeatOperation.h"
+#include "Nodes/Protocol.h"
 
 class Parser {
 private:
@@ -19,8 +20,6 @@ private:
 	void nextToken() {
 		token = s.nextToken();
 	}
-
-	bool consume(bool isPermissive, TokenType expected);
 
 	std::shared_ptr<Packet> parsePacket();
 
@@ -38,8 +37,6 @@ private:
 
 	std::shared_ptr<AltOperation> parseAltOperation();
 
-	std::shared_ptr<PacketReference> parsePacketReference();
-
 	std::shared_ptr<SequenceReference> parseSequenceReference();
 
 	std::shared_ptr<RepeatOperation> parseSimpleRepeatOperation();
@@ -52,6 +49,17 @@ private:
 
 	std::shared_ptr<Expression> parseExpression();
 
+
+	bool consume(bool isPermissive, TokenType expected);
+
+	bool consumeNumber(bool isPermissive, unsigned int *number);
+
+	bool consumeIdentifier(bool isPermissive, std::string &str);
+
+	bool consumeType(bool isPermissive, TokenType &type);
+
+	bool consumeOperator(bool isPermissive, TokenType &type);
+
 public:
 	Parser(Scanner &ns, Source &nsrc) : s(ns), src(nsrc) {
 		nextToken();
@@ -59,11 +67,7 @@ public:
 
 	std::shared_ptr<Protocol>  parse();
 
-	std::string consumeIdentifier(bool isPermissive);
-
-	unsigned int consumeNumber(bool isPermissive);
-
-	bool consumeNumber(bool isPermissive, unsigned int *number);
+	bool consumeNumber(bool isPermissive, unsigned int &number);
 };
 
 

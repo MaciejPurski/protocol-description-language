@@ -16,7 +16,8 @@ public:
 	void start() {
 		std::shared_ptr<Protocol> prot = p.parse();
 
-		prot->traverseParseTree(0);
+		if (prot != nullptr)
+			prot->traverseParseTree(0);
 	}
 };
 

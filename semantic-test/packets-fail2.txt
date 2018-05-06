@@ -1,0 +1,11 @@
+packet abc {
+	bytes(1) pid = 0x01;
+}
+
+packet def {
+	int(8) field;
+}
+
+protocol iot {
+	abc;
+}

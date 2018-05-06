@@ -1,0 +1,12 @@
+sequence abc {
+	ref;
+	ood;
+	ref2();
+	ref3
+	)
+}
+
+protocol iot {
+	abc();
+	ddfa;
+}

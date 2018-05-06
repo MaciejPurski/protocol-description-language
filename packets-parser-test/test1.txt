@@ -1,0 +1,14 @@
+packet a {
+	bytes(1) pid = 0x01;
+	string(8) a_field;
+}
+
+packet b {
+	bytes(1) pid = 0x02;
+	string(6) b_field;
+}
+
+protocol iot {
+	a;
+	b;
+}

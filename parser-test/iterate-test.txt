@@ -1,0 +1,23 @@
+sequence abc {
+	iterate {
+		a;
+		b;
+		c;
+	}
+	
+	do_iterate {
+		d;
+		e;
+		f;
+	}
+	
+	opt {
+		g;
+		h;
+		i;
+	}
+}
+
+protocol iot {
+	abc();
+}

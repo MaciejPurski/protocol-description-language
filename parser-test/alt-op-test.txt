@@ -1,0 +1,22 @@
+sequence abc {
+	alt {
+		a;
+		b();
+	} or {
+		c;
+		d;
+	} or {
+		e();
+		f();
+
+		alt {
+			g;
+		} or {
+			h;
+		}
+	}
+}
+
+protocol iot {
+	abc();
+}

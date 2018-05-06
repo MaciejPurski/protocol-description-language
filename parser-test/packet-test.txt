@@ -1,6 +1,7 @@
 packet ACK {
 	int(4) abc;
 	bytes(1) pid = 0x01;
+	string(abc + 4) str;
 }
 
 protocol iot {

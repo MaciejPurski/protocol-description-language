@@ -1,0 +1,25 @@
+packet abc {
+	bytes(1) pid = 0x01;
+}
+
+packet def {
+	bytes(1) pid = 0x02;
+	int(8) field;
+}
+
+packet fail {
+	bytes(1) pid = 0x03;
+	int(4) length;
+	int(2) len;
+
+	string(length) dependent;
+	string(length + 4) dep2;
+	string(length*2) dep3;
+	string(len) dep_fail;
+	
+	string(len + length*4) double_dep;
+}
+
+protocol iot {
+	abc;
+}

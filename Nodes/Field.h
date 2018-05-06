@@ -14,6 +14,7 @@ public:
 	std::string name;
 	bool isAssigned;
 	int assignedValue;
+	bool isDependent();
 
 	Field(std::shared_ptr<Type> &type, std::string &name, bool isAssigned, int assignedValue) : type(type),
 	                                                                                                        name(name),
@@ -21,6 +22,7 @@ public:
 			                                                                                                        isAssigned),
 	                                                                                                        assignedValue(
 			                                                                                                        assignedValue) {}
+
 };
 
 

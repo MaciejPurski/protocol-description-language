@@ -4,13 +4,11 @@
 #include "LexerTest.h"
 #include "Parser.h"
 #include "ParserTest.h"
+#include "Interpreter.h"
 
 int main(int argc, char *argv[]) {
-	if (argc != 3) {
+	if (argc < 3) {
 		std::cout << "Usage: ./TKOM --lexer-test <file>\n";
-		std::cout << argv[0] << std::endl;
-		std::cout << argv[1] << std::endl;
-		std::cout << argv[2] << std::endl;
 		exit(1);
 	}
 
@@ -30,6 +28,21 @@ int main(int argc, char *argv[]) {
 			ParserTest p(argv[2]);
 
 			p.start();
+		} catch (std::exception &e) {
+			std::cout << e.what() << std::endl;
+
+			std::cout << "Program terminated\n";
+		}
+
+
+	} else if (!strcmp(argv[1], "--packets-parser")) {
+		try {
+			if (argc != 4) {
+				std::cout << "Not enough arguments\n";
+			}
+			Interpreter i(argv[2], argv[3]);
+
+			i.start();
 		} catch (std::exception &e) {
 			std::cout << e.what() << std::endl;
 
