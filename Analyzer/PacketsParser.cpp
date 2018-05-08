@@ -137,12 +137,10 @@ unsigned int PacketsParser::evaluateFieldLength(std::vector<AnalyzerField> &fiel
 		case IDENT:
 			i = std::static_pointer_cast<Identifier>(expr->first);
 
-			std::cout << "ident field length\n";
 			// look for a dependent field
 			for (auto f : fields) {
 				// found
 				if (f.name == i->str) {
-					std::cout << "found field: " << f.name << std::endl;
 					if (f.type == UINT_TYPE)
 						result += f.uintVal;
 					else
@@ -186,7 +184,6 @@ unsigned int PacketsParser::evaluateFieldLength(std::vector<AnalyzerField> &fiel
 	}
 
 	return result;
-	return 0;
 }
 
 

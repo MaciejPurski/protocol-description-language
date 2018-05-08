@@ -9,12 +9,10 @@
 
 class PacketReference : public Reference {
 public:
-	static std::shared_ptr<PacketsParser> parser;
+	static PacketsParser *parser;
 
-	int call() {
-
-	}
-	std::string name;
+	bool execute(std::deque<std::string> &callQueue, unsigned int depth,
+	                  unsigned int &pointerPosition);
 	void traverseParseTree(int level);
 	PacketReference() {}
 };

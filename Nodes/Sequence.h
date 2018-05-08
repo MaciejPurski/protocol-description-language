@@ -1,12 +1,14 @@
 #ifndef TKOM_SEQUENCEBLOCK_H
 #define TKOM_SEQUENCEBLOCK_H
 
+#include <deque>
 #include "Block.h"
 #include "Node.h"
 
 class Sequence : public Node {
 public:
-	int execute();
+	bool execute(std::deque<std::string> &callDeque, unsigned int depth,
+	             unsigned int &pointerPosition);
 	std::string name;
 	std::shared_ptr<Block> block;
 

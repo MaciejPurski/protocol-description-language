@@ -21,7 +21,7 @@ private:
 	std::shared_ptr<Protocol> prot;
 	std::unordered_map<std::string, std::shared_ptr<Packet>> packetsMap;
 	std::unordered_map<uint64_t, std::shared_ptr<Packet>> pidMap;
-	std::unordered_map<std::string, std::shared_ptr<Sequence>> sequenceMap;
+
 
 	bool fillPacketsMap();
 	bool fillSequenceMap();
@@ -45,6 +45,14 @@ public:
 		// TODO: different pids
 		packetsParser.parsePackets(pidMap, 0, 1);
 		packetsParser.showPacket();
+
+		std::deque<std::string> callQueue;
+		unsigned int position = 0;
+
+		prot->protocol->execute(callQueue, 0, position);
+
+		for (auto str : callQueue)
+			std::cout << str << std::endl;
 	}
 
 	bool findPacketPid(std::shared_ptr<Packet> p);

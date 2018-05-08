@@ -13,9 +13,8 @@ public:
 
 	void traverseParseTree(int level);
 
-	int call() {
-
-	}
+	bool execute(std::deque<std::string> &callQueue, unsigned int depth,
+	                  unsigned int &pointerPosition);
 
 	AltOperation(std::vector<std::shared_ptr<Block>> &b) : blocks(b) { }
 };

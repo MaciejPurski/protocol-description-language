@@ -10,6 +10,7 @@ class PacketsParser {
 private:
 	std::vector<AnalyzerPacket> packets;
 	std::fstream file;
+	unsigned int currentPosition = 0;
 
 	uint64_t parseUInt(char *buf, unsigned int size);
 
@@ -30,6 +31,13 @@ public:
 
 	unsigned int evaluateFieldLength(std::vector<AnalyzerField> &fields, std::shared_ptr<Field> f);
 
+	const AnalyzerPacket &getPacket() {
+		if (currentPosition < packets.size())
+			return packets[currentPosition];
+		else
+			throw std::runtime_error("Index out of bounds of packets array");
+	}
+
 	const AnalyzerPacket &getPacket(unsigned int index) {
 		if (index < packets.size())
 			return packets[index];
@@ -37,8 +45,21 @@ public:
 			throw std::runtime_error("Index out of bounds of packets array");
 	}
 
+
 	unsigned long getNPackets() {
 		return packets.size();
+	}
+
+	unsigned int getCurrentPosition() {
+		return currentPosition;
+	}
+
+	void incrementCurrentPosition() {
+		currentPosition++;
+	}
+
+	void setCurrentPosition(unsigned int newPos) {
+		currentPosition = newPos;
 	}
 };
 

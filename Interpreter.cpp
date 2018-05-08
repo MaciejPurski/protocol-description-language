@@ -1,4 +1,5 @@
 #include "Interpreter.h"
+#include "Nodes/PacketReference.h"
 
 
 bool Interpreter::fillPacketsMap() {
@@ -20,6 +21,8 @@ bool Interpreter::fillPacketsMap() {
 		if (!checkPacketFields(p))
 			return false;
 	}
+
+	PacketReference::parser = &packetsParser;
 
 	return true;
 }
@@ -78,6 +81,7 @@ bool Interpreter::checkPacketFields(std::shared_ptr<Packet> p) {
 }
 
 bool Interpreter::fillSequenceMap() {
+	std::unordered_map<std::string, std::shared_ptr<Sequence>> sequenceMap;
 	for (auto s : prot->sequences) {
 		if (!sequenceMap.insert(std::make_pair(s->name, s)).second) {
 			std::cerr << "Sequence " << Source::strToWhite("'" + s->name + "'") << " already defined!\n";
@@ -85,6 +89,8 @@ bool Interpreter::fillSequenceMap() {
 		}
 
 	}
+
+	SequenceReference::sequenceMap = std::move(sequenceMap);
 
 	return true;
 }

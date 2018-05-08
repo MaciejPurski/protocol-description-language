@@ -1,0 +1,37 @@
+packet a {
+	uint(1) pid = 0x01;
+	int(4) val1;
+	uint(4) val2;
+	bytes(6) b;
+	string(4) str;
+}
+
+packet b {
+	uint(1) pid = 0x02;
+	int(2) val1;
+	int(2) val2;
+	bytes(6) str;
+}
+
+packet c {
+	uint(1) pid = 0x03;
+	uint(4) length;
+	bytes(length + 1) buffer;
+}
+
+sequence aabc {
+	iterate {
+		a;
+	}
+	bc();
+}
+
+sequence bc {
+	b;
+	c;
+}
+
+protocol abc {
+	a;
+	aabc();
+}
