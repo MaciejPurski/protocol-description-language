@@ -4,10 +4,13 @@
 
 #include "Operation.h"
 #include "Reference.h"
+#include "../Analyzer/PacketsParser.h"
 #include <iostream>
 
 class PacketReference : public Reference {
 public:
+	static std::shared_ptr<PacketsParser> parser;
+
 	int call() {
 
 	}
