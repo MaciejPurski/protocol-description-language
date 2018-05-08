@@ -23,7 +23,6 @@ private:
 	std::unordered_map<uint64_t, std::shared_ptr<Packet>> pidMap;
 	std::unordered_map<std::string, std::shared_ptr<Sequence>> sequenceMap;
 
-
 	bool fillPacketsMap();
 	bool fillSequenceMap();
 

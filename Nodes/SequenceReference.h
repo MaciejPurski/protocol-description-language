@@ -4,9 +4,12 @@
 #include <iostream>
 #include "Operation.h"
 #include "Reference.h"
+#include "Sequence.h"
 
 class SequenceReference : public Reference {
 public:
+	static std::shared_ptr<> sequences;
+
 	int call() {
 
 	}

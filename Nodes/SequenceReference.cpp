@@ -1,7 +1,3 @@
-//
-// Created by maciej on 22.04.18.
-//
-
 #include "SequenceReference.h"
 
 void SequenceReference::traverseParseTree(int level) {

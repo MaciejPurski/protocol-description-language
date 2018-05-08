@@ -11,11 +11,6 @@ private:
 	std::vector<AnalyzerPacket> packets;
 	std::fstream file;
 
-public:
-	PacketsParser(const char *fname);
-
-	void parsePackets(std::unordered_map<uint64_t, std::shared_ptr<Packet>> &pidMap, unsigned int pidOffset, unsigned int pidLenth);
-
 	uint64_t parseUInt(char *buf, unsigned int size);
 
 	int64_t parseInt(char *buf, unsigned int size);
@@ -23,7 +18,26 @@ public:
 	std::string parseString(char *buf, unsigned int size);
 
 	void getBytes(std::vector<char> &buf, unsigned int n);
+
+
+public:
+	PacketsParser(const char *fname);
+
+	void parsePackets(std::unordered_map<uint64_t, std::shared_ptr<Packet>> &pidMap,
+	                  unsigned int pidOffset, unsigned int pidLenth);
+
 	void showPacket();
+
+	const AnalyzerPacket &getPacket(unsigned int index) {
+		if (index < packets.size())
+			return packets[index];
+		else
+			throw std::runtime_error("Index out of bounds of packets array");
+	}
+
+	unsigned long getNPackets() {
+		return packets.size();
+	}
 };
 
 
