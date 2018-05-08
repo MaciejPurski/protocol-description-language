@@ -45,12 +45,14 @@ void PacketsParser::parsePackets(std::unordered_map<uint64_t, std::shared_ptr<Pa
 
 		for (unsigned int i = 1; i < fields.size(); i++) {
 			std::vector<char> fieldBuf;
-			unsigned int fieldLength = it->second->evaluateFieldLength(fields[i]);
+			unsigned int fieldLength = evaluateFieldLength(parsedFields, fields[i]);
 
 			// add a new field
 			parsedFields.push_back(AnalyzerField(fields[i]->name,
 			                                     fields[i]->type->type,
 			                                     fieldLength));
+
+			std::cout << "field: " << fields[i]->name << " length: " << fieldLength << std::endl;
 
 			// parse field
 			getBytes(fieldBuf, fieldLength);
@@ -117,6 +119,74 @@ void PacketsParser::getBytes(std::vector<char> &buf, unsigned int n) {
 void PacketsParser::showPacket() {
 	for (auto p : packets)
 		p.show();
+}
+
+unsigned int PacketsParser::evaluateFieldLength(std::vector<AnalyzerField> &fields, std::shared_ptr<Field> field) {
+	unsigned int result = 0;
+	std::shared_ptr<Expression> expr = field->type->length;
+	std::shared_ptr<Number> n;
+	std::shared_ptr<Identifier> i;
+
+	OperandType t = expr->first->getType();
+
+	switch (t) {
+		case NUMBER:
+			n = std::static_pointer_cast<Number>(expr->first);
+			result += n->value;
+			break;
+		case IDENT:
+			i = std::static_pointer_cast<Identifier>(expr->first);
+
+			std::cout << "ident field length\n";
+			// look for a dependent field
+			for (auto f : fields) {
+				// found
+				if (f.name == i->str) {
+					std::cout << "found field: " << f.name << std::endl;
+					if (f.type == UINT_TYPE)
+						result += f.uintVal;
+					else
+						result += f.intVal;
+				}
+			}
+			break;
+	}
+
+	for (auto op : expr->rest) {
+		t = op.second->getType();
+		unsigned int val;
+
+		switch (t) {
+			case NUMBER:
+				n = std::static_pointer_cast<Number>(op.second);
+				val = n->value;
+				break;
+			case IDENT:
+				i = std::static_pointer_cast<Identifier>(op.second);
+				for (auto f : fields) {
+					// found
+					if (f.name == i->str) {
+						val = f.length;
+					}
+				}
+				break;
+		}
+
+		switch (op.first) {
+			case ADD_OPERATOR:
+				result += val;
+				break;
+			case MUL_OPERATOR:
+				result *= val;
+				break;
+			case SUBTR_OPERATOR:
+				result -= val;
+				break;
+		}
+	}
+
+	return result;
+	return 0;
 }
 
 

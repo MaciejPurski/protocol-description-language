@@ -27,3 +27,7 @@ bool Field::isDependent() {
 
 	return false;
 }
+
+unsigned int Field::getLength() {
+
+}

@@ -15,7 +15,8 @@ packet b {
 
 packet c {
 	uint(1) pid = 0x03;
-	bytes(2) str;
+	uint(4) length;
+	bytes(length + 1) buffer;
 }
 
 protocol abc {

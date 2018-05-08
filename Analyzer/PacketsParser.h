@@ -24,6 +24,8 @@ public:
 
 	void getBytes(std::vector<char> &buf, unsigned int n);
 	void showPacket();
+
+	unsigned int evaluateFieldLength(std::vector<AnalyzerField> &fields, std::shared_ptr<Field> f);
 };
 
 

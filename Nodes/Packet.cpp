@@ -42,7 +42,8 @@ bool Packet::setPid(bool &assignedPid, unsigned int &pidOffset) {
 			return false;
 		}
 
-		offset += evaluateFieldLength(f);
+		// TODO: get a non-dependent length of a field
+		//offset += f->getLength();
 	}
 
 	std::cerr << "Packet " << Source::strToWhite("'" + name + "'") << " does not have a pid field defined!\n";
@@ -50,63 +51,5 @@ bool Packet::setPid(bool &assignedPid, unsigned int &pidOffset) {
 }
 
 unsigned int Packet::evaluateFieldLength(std::shared_ptr<Field> field) {
-	unsigned int result = 0;
-	std::shared_ptr<Expression> expr = field->type->length;
-	std::shared_ptr<Number> n;
-	std::shared_ptr<Identifier> i;
 
-	OperandType t = expr->first->getType();
-
-	switch (t) {
-		case NUMBER:
-			n = std::static_pointer_cast<Number>(expr->first);
-			result += n->value;
-			break;
-		case IDENT:
-			i = std::static_pointer_cast<Identifier>(expr->first);
-
-			// look for a dependent field
-			for (auto f : fields) {
-				// found
-				if (f->name == i->str) {
-					result += evaluateFieldLength(f);
-				}
-			}
-			break;
-	}
-
-	for (auto op : expr->rest) {
-		t = op.second->getType();
-		unsigned int val;
-
-		switch (t) {
-			case NUMBER:
-				n = std::static_pointer_cast<Number>(op.second);
-				val = n->value;
-				break;
-			case IDENT:
-				i = std::static_pointer_cast<Identifier>(op.second);
-				for (auto f : fields) {
-					// found
-					if (f->name == i->str) {
-						val = evaluateFieldLength(f);
-					}
-				}
-				break;
-		}
-
-		switch (op.first) {
-			case ADD_OPERATOR:
-				result += val;
-				break;
-			case MUL_OPERATOR:
-				result *= val;
-				break;
-			case SUBTR_OPERATOR:
-				result -= val;
-				break;
-		}
-	}
-
-	return result;
 }

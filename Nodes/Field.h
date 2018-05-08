@@ -22,6 +22,7 @@ public:
 			                                                                                                        isAssigned),
 	                                                                                                        assignedValue(
 			                                                                                                        assignedValue) {}
+	unsigned int getLength();
 
 };
 
