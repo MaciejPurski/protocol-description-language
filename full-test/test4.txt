@@ -1,0 +1,49 @@
+packet a {
+	uint(1) pid = 0x01;
+	string(8) str;
+}
+
+packet b {
+	uint(1) pid = 0x02;
+	int(4) val;
+}
+
+packet c {
+	uint(1) pid = 0x03;
+	bytes(6) arr;
+}
+
+packet d {
+	uint(1) pid = 0x04;
+	bytes(2) b;
+	string(10) str;
+	int(4) val;
+}
+
+sequence aab_cd {
+	alt {
+		a;
+		a;
+		b;
+	} or {
+		c;
+		d;
+	}
+}
+
+sequence dc_ {
+	iterate {
+		d;
+		repeat (1, 2) {
+			c;
+		}
+	}
+}
+
+protocol test {
+	repeat (3) {
+		aab_cd();
+	}
+
+	dc_();
+}

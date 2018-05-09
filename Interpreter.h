@@ -50,8 +50,12 @@ public:
 			std::deque<std::string> callQueue;
 			unsigned int position = 0;
 
-			if (!prot->protocol->execute(callQueue, 0, position)) {
-				std::cout << strToRed("Protocol not recognized") << std::endl;
+			try {
+				if (!prot->protocol->execute(callQueue, 0, position)) {
+					std::cout << strToRed("Protocol not recognized") << std::endl;
+				}
+			} catch (std::exception &e) {
+				std::cout << strToRed("Error: ") << e.what() << std::endl;
 			}
 
 

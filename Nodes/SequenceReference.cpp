@@ -13,5 +13,10 @@ void SequenceReference::traverseParseTree(int level) {
 bool SequenceReference::execute(std::deque<std::string> &callQueue, unsigned int depth,
 									 unsigned int &positionPointer)
 {
-	return sequenceMap[Reference::name]->execute(callQueue, depth, positionPointer);
+	auto it = sequenceMap.find(Reference::name);
+	if (it == sequenceMap.end()) {
+		throw std::runtime_error("Undefined reference to sequence: " + Reference::name);
+	}
+
+	return it->second->execute(callQueue, depth, positionPointer);
 }
