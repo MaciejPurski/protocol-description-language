@@ -40,7 +40,17 @@ int main(int argc, char *argv[]) {
 			if (argc != 4) {
 				std::cout << "Not enough arguments\n";
 			}
-			Interpreter i(argv[2], argv[3]);
+			Interpreter i(argv[2], argv[3], false);
+
+			i.start();
+		} catch (std::exception &e) {
+			std::cout << e.what() << std::endl;
+
+			std::cout << "Program terminated\n";
+		}
+	} else if (argc == 3) {
+		try {
+			Interpreter i(argv[1], argv[2], true);
 
 			i.start();
 		} catch (std::exception &e) {
@@ -49,13 +59,11 @@ int main(int argc, char *argv[]) {
 			std::cout << "Program terminated\n";
 		}
 
-
 	} else {
 		std::cout << "Unknown arguments\n";
 		exit(1);
 
 	}
-
 
 
     return 0;

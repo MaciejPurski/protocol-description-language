@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include "Token.h"
+#include "Colors.h"
 
 class Source {
 private:
@@ -24,8 +25,6 @@ public:
 	int getNErrors();
 	void printLine();
 	int getIndex();
-	static std::string strToRed(const std::string &str);
-	static std::string strToWhite(const std::string &str);
 };
 
 

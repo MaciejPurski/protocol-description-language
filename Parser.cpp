@@ -2,8 +2,7 @@
 #include <climits>
 #include <cstdarg>
 #include "Parser.h"
-#include "Nodes/Sequence.h"
-#include "Nodes/RepeatOperation.h"
+#include "Colors.h"
 #include "Nodes/PacketReference.h"
 
 std::shared_ptr<Protocol> Parser::parse() {
@@ -349,7 +348,7 @@ std::shared_ptr<Expression> Parser::parseExpression() {
 		first = std::make_shared<Identifier>(str);
 	else {
 		src.raiseError("Expected identifier or number before " +
-		               Source::strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
+		               strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
 		nextToken();
 
 		return nullptr;
@@ -362,7 +361,7 @@ std::shared_ptr<Expression> Parser::parseExpression() {
 			rest.push_back(std::make_pair(type, std::make_shared<Identifier>(str)));
 		else {
 			src.raiseError("Expected identifier or number before " +
-			               Source::strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
+			               strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
 			nextToken();
 
 			return nullptr;
@@ -381,8 +380,8 @@ bool Parser::consume(bool isPermissive, TokenType expected) {
 
 	// report an error
 	if (!isPermissive) {
-		src.raiseError("Expected " + Source::strToWhite("'" + Scanner::tokenToString(expected) + "'") + " before " +
-		               Source::strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
+		src.raiseError("Expected " + strToWhite("'" + Scanner::tokenToString(expected) + "'") + " before " +
+		               strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
 
 		nextToken();
 	}
@@ -397,7 +396,7 @@ bool Parser::consumeIdentifier(bool isPermissive, std::string &str) {
 		return true;
 	} else if (!isPermissive) {
 		src.raiseError("Expected identifier before " +
-		               Source::strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
+		               strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
 
 		nextToken();
 
@@ -415,7 +414,7 @@ bool Parser::consumeNumber(bool isPermissive, unsigned int &number) {
 
 	if (!isPermissive) {
 		src.raiseError("Expected identifier before " +
-		               Source::strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
+		               strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
 
 		nextToken();
 	}
@@ -429,7 +428,7 @@ bool Parser::consumeType(bool isPermissive, enum TokenType &type) {
 
 		if (!isPermissive) {
 			src.raiseError("Expected identifier before " +
-			               Source::strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
+			               strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
 
 			nextToken();
 		}
@@ -451,7 +450,7 @@ bool Parser::consumeOperator(bool isPermissive, TokenType &type) {
 
 		if (!isPermissive) {
 			src.raiseError("Expected operator before " +
-			               Source::strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
+			               strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
 
 			nextToken();
 		}

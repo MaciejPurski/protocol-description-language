@@ -1,4 +1,5 @@
 #include "Sequence.h"
+#include "../Colors.h"
 
 void Sequence::traverseParseTree(int level) {
 	for (int i = 0; i < level; i++)
@@ -15,19 +16,17 @@ bool Sequence::execute(std::deque<std::string> &callDeque, unsigned int depth, u
 	std::string str;
 	// remember current position in order to restore it later
 	unsigned int oldPosition = currentPosition;
+	unsigned long oldSize = callDeque.size();
 
 	for (int i = 0; i < depth; i++) {
-		str += '-';
+		str += '\t';
 	}
 
-	std::cout << "entered: " << name << std::endl;
-
-	callDeque.push_back(str + "sequence: " + name);
+	callDeque.push_back("\n" + strToBlue(str + "SEQUENCE call: ") + strToWhite(name));
 
 	// execution failed
 	if (!block->execute(callDeque, depth + 1, currentPosition)) {
-		std::cout << "pop_back()\n";
-		callDeque.pop_back();
+		callDeque.resize(oldSize);
 		currentPosition = oldPosition;
 		return false;
 	}

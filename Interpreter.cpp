@@ -1,11 +1,11 @@
 #include "Interpreter.h"
 #include "Nodes/PacketReference.h"
-
+#include "Colors.h"
 
 bool Interpreter::fillPacketsMap() {
 	for (auto p : prot->packets) {
 		if (!packetsMap.insert(std::make_pair(p->name, p)).second) {
-			std::cerr << "Packet " << Source::strToWhite("'" + p->name + "'") << " already defined!\n";
+			std::cerr << "Packet " << strToWhite("'" + p->name + "'") << " already defined!\n";
 			return false;
 		}
 
@@ -14,7 +14,7 @@ bool Interpreter::fillPacketsMap() {
 			return false;
 
 		if (!pidMap.insert(std::make_pair(p->pid->assignedValue, p)).second) {
-			std::cerr << "Packet of pid " << Source::strToWhite("'" + std::to_string(p->pid->assignedValue) + "'") << " already defined!\n";
+			std::cerr << "Packet of pid " << strToWhite("'" + std::to_string(p->pid->assignedValue) + "'") << " already defined!\n";
 			return false;
 		}
 
@@ -39,8 +39,8 @@ bool Interpreter::checkPacketFields(std::shared_ptr<Packet> p) {
 			for (auto it2 = p->fields.begin(); it2 != it; it2++) {
 				if (i->str == (*it2)->name) {
 					if ((*it2)->type->type != INT_TYPE && (*it2)->type->type != UINT_TYPE) {
-						std::cerr << "Packet's: " << Source::strToWhite("'" + p->name + "'") << " field depends on wrong type of field: " <<
-						          Source::strToWhite("'" + (*it2)->name + "'") << "\n";
+						std::cerr << "Packet's: " << strToWhite("'" + p->name + "'") << " field depends on wrong type of field: " <<
+						          strToWhite("'" + (*it2)->name + "'") << "\n";
 						return false;
 					}
 					found = true;
@@ -48,8 +48,8 @@ bool Interpreter::checkPacketFields(std::shared_ptr<Packet> p) {
 			}
 
 			if (!found) {
-				std::cerr << "Packet's " << Source::strToWhite("'" + p->name + "'") << " field: " <<
-				          Source::strToWhite("'" + (*it)->name + "'") << " has unresolved dependencies" << "\n";
+				std::cerr << "Packet's " << strToWhite("'" + p->name + "'") << " field: " <<
+				          strToWhite("'" + (*it)->name + "'") << " has unresolved dependencies" << "\n";
 				return false;
 			}
 		}
@@ -69,8 +69,8 @@ bool Interpreter::checkPacketFields(std::shared_ptr<Packet> p) {
 			}
 
 			if (!found) {
-				std::cerr << "Packet's " << Source::strToWhite("'" + p->name + "'") << " field: " <<
-				          Source::strToWhite("'" + (*it)->name + "'") << " has unresolved dependencies" << "\n";
+				std::cerr << "Packet's " << strToWhite("'" + p->name + "'") << " field: " <<
+				          strToWhite("'" + (*it)->name + "'") << " has unresolved dependencies" << "\n";
 				return false;
 			}
 
@@ -84,7 +84,7 @@ bool Interpreter::fillSequenceMap() {
 	std::unordered_map<std::string, std::shared_ptr<Sequence>> sequenceMap;
 	for (auto s : prot->sequences) {
 		if (!sequenceMap.insert(std::make_pair(s->name, s)).second) {
-			std::cerr << "Sequence " << Source::strToWhite("'" + s->name + "'") << " already defined!\n";
+			std::cerr << "Sequence " << strToWhite("'" + s->name + "'") << " already defined!\n";
 			return false;
 		}
 

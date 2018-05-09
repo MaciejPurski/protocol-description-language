@@ -3,30 +3,35 @@
 #include <iomanip>
 
 void AnalyzerField::show() {
-	std::cout << name << "(";
+	std::cout << toStr();
+}
+
+std::string AnalyzerField::toStr() const {
+	std::stringstream s;
+
+	s << name << "(";
 
 	switch (type) {
 		case BYTES_TYPE:
 			for (auto b : bytes) {
-				std::ios_base::fmtflags f( std::cout.flags() );
-
-				std::cout << std::hex << std::showbase // show the 0x prefix
-				                      << std::internal // fill between the prefix and the number
-				                      << std::setfill('0') // fill with 0s
-									  << (unsigned int) b << " ";
-				std::cout.flags(f);
+				s << std::hex << std::showbase // show the 0x prefix
+				          << std::internal // fill between the prefix and the number
+				          << std::setfill('0') // fill with 0s
+				          << (unsigned int) b << " ";
 			}
 			break;
 		case STRING_TYPE:
-			std::cout << strValue;
+			s << strValue;
 			break;
 		case INT_TYPE:
-			std::cout << intVal;
+			s << intVal;
 			break;
 		case UINT_TYPE:
-			std::cout << uintVal;
+			s << uintVal;
 			break;
 	}
 
-	std::cout << ") ";
+	s << ") ";
+
+	return s.str();
 }

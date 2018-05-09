@@ -22,6 +22,8 @@ public:
 
 	void show();
 
+	std::string toStr() const;
+
 };
 
 

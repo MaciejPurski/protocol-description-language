@@ -50,6 +50,8 @@ public:
 		return packets.size();
 	}
 
+
+
 	unsigned int getCurrentPosition() {
 		return currentPosition;
 	}

@@ -52,8 +52,6 @@ void PacketsParser::parsePackets(std::unordered_map<uint64_t, std::shared_ptr<Pa
 			                                     fields[i]->type->type,
 			                                     fieldLength));
 
-			std::cout << "field: " << fields[i]->name << " length: " << fieldLength << std::endl;
-
 			// parse field
 			getBytes(fieldBuf, fieldLength);
 

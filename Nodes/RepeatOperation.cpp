@@ -30,14 +30,13 @@ RepeatOperation::execute(std::deque<std::string> &callQueue, unsigned int depth,
 
 	} while (success);
 
-	std::cout << "repeat operation performed: " << counter << "times\n";
 	if (counter < repeatFrom || counter > repeatTo) {
 		//restore position and queue size
 		pointerPosition = oldPosition;
 		callQueue.resize(queueSize);
 
-		return 0;
+		return false;
 	}
 
-	return 1;
+	return true;
 }

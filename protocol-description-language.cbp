@@ -102,6 +102,9 @@
 		<Unit filename="/home/maciej/studia/TKOM/Analyzer/PacketsParser.h">
 			<Option target="TKOM"/>
 		</Unit>
+		<Unit filename="/home/maciej/studia/TKOM/Colors.h">
+			<Option target="TKOM"/>
+		</Unit>
 		<Unit filename="/home/maciej/studia/TKOM/Interpreter.cpp">
 			<Option target="TKOM"/>
 		</Unit>
@@ -121,6 +124,9 @@
 			<Option target="TKOM"/>
 		</Unit>
 		<Unit filename="/home/maciej/studia/TKOM/Nodes/Block.h">
+			<Option target="TKOM"/>
+		</Unit>
+		<Unit filename="/home/maciej/studia/TKOM/Nodes/Executable.h">
 			<Option target="TKOM"/>
 		</Unit>
 		<Unit filename="/home/maciej/studia/TKOM/Nodes/Expression.cpp">

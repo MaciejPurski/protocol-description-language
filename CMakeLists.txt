@@ -7,4 +7,4 @@ add_executable(TKOM main.cpp Source.cpp Source.h Scanner.cpp Scanner.h Token.h L
         Nodes/Protocol.cpp Nodes/Protocol.h Nodes/Sequence.cpp Nodes/Sequence.h Nodes/Block.h Nodes/Operation.h Nodes/RepeatOperation.h Nodes/AltOperation.h
         Nodes/SequenceReference.cpp Nodes/SequenceReference.h Nodes/PacketReference.cpp Nodes/PacketReference.h ParserTest.h Nodes/Node.h Nodes/Block.cpp
         Nodes/Packet.cpp Nodes/Packet.h Nodes/AltOperation.cpp Nodes/RepeatOperation.cpp Nodes/Field.cpp Nodes/Field.h Nodes/Type.cpp Nodes/Type.h Nodes/Expression.cpp
-        Nodes/Expression.h Nodes/Reference.h Interpreter.cpp Interpreter.h Analyzer/AnalyzerPacket.cpp Analyzer/AnalyzerPacket.h Analyzer/AnalyzerField.cpp Analyzer/AnalyzerField.h Analyzer/PacketsParser.cpp Analyzer/PacketsParser.h Analyzer/SequenceParser.cpp Analyzer/SequenceParser.h Nodes/Executable.h)
+        Nodes/Expression.h Nodes/Reference.h Interpreter.cpp Interpreter.h Analyzer/AnalyzerPacket.cpp Analyzer/AnalyzerPacket.h Analyzer/AnalyzerField.cpp Analyzer/AnalyzerField.h Analyzer/PacketsParser.cpp Analyzer/PacketsParser.h Nodes/Executable.h Colors.h)

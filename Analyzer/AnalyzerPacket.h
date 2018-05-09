@@ -16,12 +16,19 @@ public:
 		fields = nfields;
 	}
 
+	std::string toStr() const {
+		std::string str;
+
+		str = name + ": ";
+		for (auto f : fields)
+			str += f.toStr();
+
+		return str;
+	}
+
 
 	void show() {
-		int offset = 0;
-		std::cout << "PACKET name(" << name <<") ";
-		for (auto f : fields)
-			f.show();
+		std::cout << "PACKET: " << toStr();
 
 		std::cout << std::endl;
 	}

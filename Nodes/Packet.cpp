@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Packet.h"
 #include "../Source.h"
+#include "../Colors.h"
 
 void Packet::traverseParseTree(int level) {
 	for (int i = 0; i < level; i++)
@@ -24,12 +25,12 @@ bool Packet::setPid(bool &assignedPid, unsigned int &pidOffset) {
 				assignedPid = true;
 				pidOffset = offset;
 			} else if (offset != pidOffset) {
-				std::cerr << "Pid offset of packet: " << Source::strToWhite("'" + name + "'") << " differs from others" << "\n";
+				std::cerr << "Pid offset of packet: " << strToWhite("'" + name + "'") << " differs from others" << "\n";
 				return false;
 			}
 
 			if (!f->isAssigned) {
-				std::cerr << "No value assigned for pid of packet " << Source::strToWhite("'" + name + "'") << "\n";
+				std::cerr << "No value assigned for pid of packet " << strToWhite("'" + name + "'") << "\n";
 				return false;
 			}
 
@@ -38,7 +39,7 @@ bool Packet::setPid(bool &assignedPid, unsigned int &pidOffset) {
 		}
 
 		if (f->isDependent()) {
-			std::cerr << "Pid of packet: " << Source::strToWhite("'" + name + "'") << "is defined after dependent fields" << "\n";
+			std::cerr << "Pid of packet: " << strToWhite("'" + name + "'") << "is defined after dependent fields" << "\n";
 			return false;
 		}
 
@@ -46,7 +47,7 @@ bool Packet::setPid(bool &assignedPid, unsigned int &pidOffset) {
 		//offset += f->getLength();
 	}
 
-	std::cerr << "Packet " << Source::strToWhite("'" + name + "'") << " does not have a pid field defined!\n";
+	std::cerr << "Packet " << strToWhite("'" + name + "'") << " does not have a pid field defined!\n";
 	return false;
 }
 

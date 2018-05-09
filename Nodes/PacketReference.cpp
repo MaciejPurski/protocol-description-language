@@ -1,4 +1,5 @@
 #include "PacketReference.h"
+#include "../Colors.h"
 
 PacketsParser *PacketReference::parser = nullptr;
 
@@ -11,19 +12,17 @@ void PacketReference::traverseParseTree(int level) {
 
 bool PacketReference::execute(std::deque<std::string> &callQueue, unsigned int depth,
                                    unsigned int &pointerPosition) {
-	std::cout << "try to get packet: " << Reference::name << std::endl;
+
 	if (pointerPosition >= parser->getNPackets() || parser->getPacket(pointerPosition).name != Reference::name) {
-		std::cout << "fail getting packet: " << Reference::name << std::endl;
-		return 0;
+		return false;
 	}
 
-	pointerPosition++;
 	std::string str;
 	for (int i = 0; i < depth; i++)
-		str += '-';
+		str += '\t';
 
-	callQueue.push_back(str + "packet: " + name);
-	std::cout << "pushed " << str + "packet: " + name << std::endl;
+	callQueue.push_back(strToYellow(str + "PACKET: ") + strToWhite(parser->getPacket(pointerPosition).toStr()));
+	pointerPosition++;
 
-	return 1;
+	return true;
 }

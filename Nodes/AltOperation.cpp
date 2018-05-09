@@ -11,6 +11,13 @@ void AltOperation::traverseParseTree(int level) {
 		b->traverseParseTree(level + 1);
 }
 
-bool AltOperation::execute(std::deque<std::string> &callQueue, unsigned int depth, unsigned int &pointerPosition) {
-	return 0;
+bool AltOperation::execute(std::deque<std::string> &callQueue, unsigned int depth,
+                           unsigned int &pointerPosition) {
+
+	for (auto &b : blocks) {
+		if (b->execute(callQueue, depth, pointerPosition))
+			return true;
+	}
+
+	return false;
 }

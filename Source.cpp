@@ -11,22 +11,6 @@ int Source::getIndex() {
 	return characterPosition;
 }
 
-std::string Source::strToRed(const std::string &str) {
-#ifdef __unix__
-	return  std::string("\033[1;31m" + str + "\033[0m");
-#else
-	return str;
-#endif
-}
-
-std::string Source::strToWhite(const std::string &str) {
-#ifdef __unix__
-	return  std::string("\033[1;37m" + str + "\033[0m");
-#else
-	return str;
-#endif
-}
-
 void Source::raiseError(const std::string &errorDesc, Token &token) {
 	nErrors++;
 

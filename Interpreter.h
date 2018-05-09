@@ -17,6 +17,7 @@ private:
 	Parser p;
 	PacketsParser packetsParser;
 	bool assignedPid;
+	bool interpretPackets;
 	unsigned int pidOffset;
 	std::shared_ptr<Protocol> prot;
 	std::unordered_map<std::string, std::shared_ptr<Packet>> packetsMap;
@@ -27,8 +28,8 @@ private:
 	bool fillSequenceMap();
 
 public:
-	Interpreter(const char *srcFile, const char *protocolFile) : src(srcFile, false), s(src), p(s, src), packetsParser(protocolFile) {
-	}
+	Interpreter(const char *srcFile, const char *protocolFile, bool ninterpretPackets) : src(srcFile, false), s(src), p(s, src), packetsParser(protocolFile),
+	interpretPackets(ninterpretPackets) { }
 
 	void start() {
 		prot = p.parse();
@@ -44,15 +45,29 @@ public:
 
 		// TODO: different pids
 		packetsParser.parsePackets(pidMap, 0, 1);
-		packetsParser.showPacket();
 
-		std::deque<std::string> callQueue;
-		unsigned int position = 0;
+		if (interpretPackets) {
+			std::deque<std::string> callQueue;
+			unsigned int position = 0;
 
-		prot->protocol->execute(callQueue, 0, position);
+			if (!prot->protocol->execute(callQueue, 0, position)) {
+				std::cout << strToRed("Protocol not recognized") << std::endl;
+			}
 
-		for (auto str : callQueue)
-			std::cout << str << std::endl;
+
+			for (const auto &str : callQueue)
+				std::cout << str << std::endl;
+
+			if (position != packetsParser.getNPackets()) {
+				std::cout << strToRed("Packets left unrecognized") << std::endl;
+			}
+
+		} else {
+			packetsParser.showPacket();
+		}
+
+
+
 	}
 
 	bool findPacketPid(std::shared_ptr<Packet> p);
