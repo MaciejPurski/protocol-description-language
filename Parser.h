@@ -21,33 +21,33 @@ private:
 		token = s.nextToken();
 	}
 
-	std::shared_ptr<Packet> parsePacket();
+	std::unique_ptr<Packet> parsePacket();
 
-	std::shared_ptr<Sequence> parseSequence();
+	std::unique_ptr<Sequence> parseSequence();
 
-	std::shared_ptr<Sequence> parseProtocol();
+	std::unique_ptr<Sequence> parseProtocol();
 
-	std::shared_ptr<Block> parseBlock();
+	std::unique_ptr<Block> parseBlock();
 
-	std::shared_ptr<Operation> parseOperation();
+	std::unique_ptr<Operation> parseOperation();
 
-	std::shared_ptr<Reference> parseReference();
+	std::unique_ptr<Reference> parseReference();
 
-	std::shared_ptr<RepeatOperation> parseRepeatOperation();
+	std::unique_ptr<RepeatOperation> parseRepeatOperation();
 
-	std::shared_ptr<AltOperation> parseAltOperation();
+	std::unique_ptr<AltOperation> parseAltOperation();
 
-	std::shared_ptr<SequenceReference> parseSequenceReference();
+	std::unique_ptr<SequenceReference> parseSequenceReference();
 
-	std::shared_ptr<RepeatOperation> parseSimpleRepeatOperation();
+	std::unique_ptr<RepeatOperation> parseSimpleRepeatOperation();
 
-	std::shared_ptr<RepeatOperation> parseCompoundRepeatOperation();
+	std::unique_ptr<RepeatOperation> parseCompoundRepeatOperation();
 
-	std::shared_ptr<Field> parseField();
+	std::unique_ptr<Field> parseField();
 
-	std::shared_ptr<Type> parseType();
+	std::unique_ptr<Type> parseType();
 
-	std::shared_ptr<Expression> parseExpression();
+	std::unique_ptr<Expression> parseExpression();
 
 
 	bool consume(bool isPermissive, TokenType expected);
@@ -65,7 +65,7 @@ public:
 		nextToken();
 	}
 
-	std::shared_ptr<Protocol>  parse();
+	std::unique_ptr<Protocol>  parse();
 
 	bool consumeNumber(bool isPermissive, unsigned int &number);
 };

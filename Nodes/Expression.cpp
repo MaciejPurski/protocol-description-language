@@ -7,34 +7,34 @@ void Expression::traverseParseTree(int level) {
 	for (int i = 0; i < level; i++)
 		std::cout << '-';
 
-	std::shared_ptr<Number> n;
-	std::shared_ptr<Identifier> i;
+	Number *n;
+	Identifier *i;
 
 	std::cout << "Expression: ";
 
 	OperandType t = first->getType();
 	switch (t) {
 		case NUMBER:
-			n = std::static_pointer_cast<Number>(first);
+			n = static_cast<Number*>(first.get());
 			std::cout << "number: " << n->value << " ";
 			break;
 		case IDENT:
-			i = std::static_pointer_cast<Identifier>(first);
+			i = static_cast<Identifier*>(first.get());
 			std::cout << "identifier: " << i->str << " ";
 			break;
 	}
 
-	for (auto op : rest) {
+	for (const auto &op : rest) {
 		std::cout << "operator: " << Scanner::tokenToString(op.first) << " ";
 
 		t = op.second->getType();
 		switch (t) {
 			case NUMBER:
-				n = std::static_pointer_cast<Number>(op.second);
+				n = static_cast<Number*>(op.second.get());
 				std::cout << "number: " << n->value << " ";
 				break;
 			case IDENT:
-				i = std::static_pointer_cast<Identifier>(op.second);
+				i = static_cast<Identifier*>(op.second.get());
 				std::cout << "identifier: " << i->str << " ";
 				break;
 		}

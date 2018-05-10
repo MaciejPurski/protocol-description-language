@@ -1,26 +1,25 @@
 #ifndef TKOM_PACKET_H
 #define TKOM_PACKET_H
 
-
-#include <string>
-#include <memory>
-#include <vector>
 #include "Node.h"
 #include "Field.h"
+#include <string>
+#include <vector>
+#include <memory>
 
 class Packet : public Node {
 public:
 	void traverseParseTree(int level);
 	std::string name;
-	std::vector<std::shared_ptr<Field>> fields;
-	std::shared_ptr<Field> pid;
+	std::vector<std::unique_ptr<Field>> fields;
+	uint64_t pid;
 
 	bool checkUniqueField();
-	bool setPid(bool &assignedPid, unsigned int &pidOffset);
+	bool setPid(bool &assignedPid, unsigned int &pidOffset, unsigned int &pidLength);
 
-	Packet(std::string &nname, std::vector<std::shared_ptr<Field>> &f) : name(nname), fields(f) { }
+	Packet(std::string &nname, std::vector<std::unique_ptr<Field>> f) : name(nname), fields(std::move(f)) { }
 
-	unsigned int evaluateFieldLength(std::shared_ptr<Field> f);
+	unsigned int evaluateFieldLength(std::unique_ptr<Field> f);
 private:
 
 };

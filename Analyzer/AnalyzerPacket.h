@@ -1,10 +1,10 @@
 #ifndef PROTOCOL_DESCRIPTION_LANGUAGE_ANALYZERPACKET_H
 #define PROTOCOL_DESCRIPTION_LANGUAGE_ANALYZERPACKET_H
 
-
-#include <vector>
-#include "../Nodes/Packet.h"
 #include "AnalyzerField.h"
+#include <vector>
+#include <iostream>
+
 
 class AnalyzerPacket {
 public:

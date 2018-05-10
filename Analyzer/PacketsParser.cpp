@@ -1,15 +1,6 @@
 #include "PacketsParser.h"
 
-PacketsParser::PacketsParser(const char *fileName) {
-	file.open(fileName, std::ios::in);
-
-	if (!file.is_open())
-		throw std::runtime_error("Can't open file: " + std::string(fileName));
-
-}
-
-void PacketsParser::parsePackets(std::unordered_map<uint64_t, std::shared_ptr<Packet>> &pidMap,
-                                 unsigned int pidOffset, unsigned int pidLength) {
+void PacketsParser::parsePackets() {
 	int c;
 
 	while ((c = file.get()) != EOF) {
@@ -19,9 +10,7 @@ void PacketsParser::parsePackets(std::unordered_map<uint64_t, std::shared_ptr<Pa
 		file.unget();
 		getBytes(buf, pidOffset);
 
-
 		// now read pid
-
 		getBytes(buf, pidLength);
 
 		uint64_t pid = parseUInt(buf.data() + pidOffset, pidLength);
@@ -41,7 +30,7 @@ void PacketsParser::parsePackets(std::unordered_map<uint64_t, std::shared_ptr<Pa
 		// parse fields
 
 		unsigned int currentOffset = pidOffset + pidLength;
-		std::vector<std::shared_ptr<Field>> &fields = it->second->fields;
+		std::vector<std::unique_ptr<Field>> &fields = it->second->fields;
 
 		for (unsigned int i = 1; i < fields.size(); i++) {
 			std::vector<char> fieldBuf;
@@ -103,6 +92,8 @@ std::string PacketsParser::parseString(char *buf, unsigned int size) {
 void PacketsParser::getBytes(std::vector<char> &buf, unsigned int n) {
 	int c;
 
+	std::cout << "getBytes: " << n << std::endl;
+
 	for (unsigned int i = 0; i < n; i++) {
 		c = file.get();
 
@@ -119,21 +110,20 @@ void PacketsParser::showPacket() {
 		p.show();
 }
 
-unsigned int PacketsParser::evaluateFieldLength(std::vector<AnalyzerField> &fields, std::shared_ptr<Field> field) {
+unsigned int PacketsParser::evaluateFieldLength(std::vector<AnalyzerField> &fields, std::unique_ptr<Field> &field) {
 	unsigned int result = 0;
-	std::shared_ptr<Expression> expr = field->type->length;
-	std::shared_ptr<Number> n;
-	std::shared_ptr<Identifier> i;
+	Number *n;
+	Identifier *i;
 
-	OperandType t = expr->first->getType();
+	OperandType t = field->type->length->first->getType();
 
 	switch (t) {
 		case NUMBER:
-			n = std::static_pointer_cast<Number>(expr->first);
+			n = static_cast<Number*>(field->type->length->first.get());
 			result += n->value;
 			break;
 		case IDENT:
-			i = std::static_pointer_cast<Identifier>(expr->first);
+			i = static_cast<Identifier*>(field->type->length->first.get());
 
 			// look for a dependent field
 			for (auto f : fields) {
@@ -148,18 +138,18 @@ unsigned int PacketsParser::evaluateFieldLength(std::vector<AnalyzerField> &fiel
 			break;
 	}
 
-	for (auto op : expr->rest) {
+	for (auto &op : field->type->length->rest) {
 		t = op.second->getType();
 		unsigned int val;
 
 		switch (t) {
 			case NUMBER:
-				n = std::static_pointer_cast<Number>(op.second);
+				n = static_cast<Number*>(op.second.get());
 				val = n->value;
 				break;
 			case IDENT:
-				i = std::static_pointer_cast<Identifier>(op.second);
-				for (auto f : fields) {
+				i = static_cast<Identifier*>(op.second.get());
+				for (auto &f : fields) {
 					// found
 					if (f.name == i->str) {
 						val = f.length;
@@ -182,6 +172,17 @@ unsigned int PacketsParser::evaluateFieldLength(std::vector<AnalyzerField> &fiel
 	}
 
 	return result;
+}
+
+PacketsParser::PacketsParser(const char *fileName,
+                             std::unordered_map<uint64_t, std::unique_ptr<Packet>> pidMap,
+                             unsigned int pidOffset, unsigned int pidLength) : pidMap(std::move(pidMap)),
+                                                                               pidOffset(pidOffset),
+                                                                               pidLength(pidLength) {
+	file.open(fileName, std::ios::in);
+
+	if (!file.is_open())
+		throw std::runtime_error("Can't open file: " + std::string(fileName));
 }
 
 

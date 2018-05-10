@@ -5,25 +5,34 @@
 #include "Colors.h"
 #include "Nodes/PacketReference.h"
 
-std::shared_ptr<Protocol> Parser::parse() {
-	std::vector<std::shared_ptr<Packet>> packets;
-	std::vector<std::shared_ptr<Sequence>> sequences;
-	std::shared_ptr<Sequence> protocol;
+std::unique_ptr<Protocol> Parser::parse() {
+	std::vector<std::unique_ptr<Packet>> packets;
+	std::vector<std::unique_ptr<Sequence>> sequences;
+	std::unique_ptr<Sequence> protocol;
 
-	std::shared_ptr<Packet> p;
-	std::shared_ptr<Sequence> s;
+	std::unique_ptr<Packet> p;
+	std::unique_ptr<Sequence> s;
+
+	bool added = false;
 
 	/* Protocol might consist of packets and sequences,
 	 * therefore we try to parse them until it is possible
 	 */
 	do {
-		if ((p = parsePacket()) != nullptr)
-			packets.push_back(p);
+		added = false;
 
-		if ((s = parseSequence()) != nullptr)
-			sequences.push_back(s);
+		if ((p = parsePacket()) != nullptr) {
+			packets.emplace_back(std::move(p));
+			added = true;
+		}
 
-	} while ((p != nullptr) || (s != nullptr));
+		if ((s = parseSequence()) != nullptr) {
+			sequences.emplace_back(std::move(s));
+			added = true;
+		}
+
+
+	} while (added);
 
 	if (src.getNErrors() > 0) {
 		std::cout << "parsing failed\n";
@@ -34,12 +43,12 @@ std::shared_ptr<Protocol> Parser::parse() {
 		return nullptr;
 	}
 
-	return std::make_shared<Protocol>(packets, sequences, protocol);
+	return std::make_unique<Protocol>(packets, sequences, protocol);
 }
 
-std::shared_ptr<Sequence> Parser::parseSequence() {
+std::unique_ptr<Sequence> Parser::parseSequence() {
 	std::string name;
-	std::vector<std::shared_ptr<Operation>> operations;
+	std::vector<std::unique_ptr<Operation>> operations;
 
 	// sequence must begin with a "sequence" keyword
 	if (!consume(true, SEQUENCE_KEYWORD))
@@ -51,31 +60,31 @@ std::shared_ptr<Sequence> Parser::parseSequence() {
 	if (!consume(false, OPEN_BRACK))
 		return nullptr;
 
-	std::shared_ptr<Block> block = parseBlock();
+	std::unique_ptr<Block> block = parseBlock();
 
 	if (block == nullptr)
 		return nullptr;
 
-	return std::make_shared<Sequence>(name, block);
+	return std::make_unique<Sequence>(name, block);
 }
 
-std::shared_ptr<Block> Parser::parseBlock() {
-	std::vector<std::shared_ptr<Operation>> operations;
-	std::shared_ptr<Operation> o;
+std::unique_ptr<Block> Parser::parseBlock() {
+	std::vector<std::unique_ptr<Operation>> operations;
+	std::unique_ptr<Operation> o;
 
 	while ((o = parseOperation()) != nullptr)
-		operations.push_back(o);
+		operations.push_back(std::move(o));
 
 	if (!consume(false, CLOSE_BRACK))
 		return nullptr;
 
 
-	return std::make_shared<Block>(operations);
+	return std::make_unique<Block>(operations);
 }
 
-std::shared_ptr<Sequence> Parser::parseProtocol() {
+std::unique_ptr<Sequence> Parser::parseProtocol() {
 	std::string name;
-	std::vector<std::shared_ptr<Operation>> operations;
+	std::vector<std::unique_ptr<Operation>> operations;
 
 	// sequence must begin with a "sequence" keyword
 	if (!consume(false, PROTOCOL_KEYWORD))
@@ -87,18 +96,18 @@ std::shared_ptr<Sequence> Parser::parseProtocol() {
 	if (!consume(false, OPEN_BRACK))
 		return nullptr;
 
-	std::shared_ptr<Block> block = parseBlock();
+	std::unique_ptr<Block> block = parseBlock();
 
 	if (block == nullptr)
 		return nullptr;
 
-	return std::make_shared<Sequence>(name, block);
+	return std::make_unique<Sequence>(name, block);
 }
 
-std::shared_ptr<Packet> Parser::parsePacket() {
+std::unique_ptr<Packet> Parser::parsePacket() {
     std::string name;
-    std::vector<std::shared_ptr<Field>> fields;
-    std::shared_ptr<Field> f;
+    std::vector<std::unique_ptr<Field>> fields;
+    std::unique_ptr<Field> f;
 
     // packet must begin with a "packet" keyword
     if (!consume(true, PACKET_KEYWORD))
@@ -111,16 +120,16 @@ std::shared_ptr<Packet> Parser::parsePacket() {
 		return nullptr;
 
 	while ((f = parseField()) != nullptr)
-		fields.push_back(f);
+		fields.push_back(std::move(f));
 
 	if (!consume(false, CLOSE_BRACK))
 		return nullptr;
 
-    return std::make_shared<Packet>(name, fields);
+    return std::make_unique<Packet>(name, std::move(fields));
 }
 
-std::shared_ptr<Operation> Parser::parseOperation() {
-	std::shared_ptr<Operation> op;
+std::unique_ptr<Operation> Parser::parseOperation() {
+	std::unique_ptr<Operation> op;
 
 	if ((op = parseReference()) != nullptr)
 		return op;
@@ -138,8 +147,8 @@ std::shared_ptr<Operation> Parser::parseOperation() {
  * A reference might be either a reference to a packet
  * or a sequence
  */
-std::shared_ptr<Reference> Parser::parseReference() {
-	std::shared_ptr<Reference> ref;
+std::unique_ptr<Reference> Parser::parseReference() {
+	std::unique_ptr<Reference> ref;
 	std::string name;
 
 	if (!consumeIdentifier(true, name))
@@ -148,7 +157,7 @@ std::shared_ptr<Reference> Parser::parseReference() {
 	ref = parseSequenceReference();
 
 	if (ref == nullptr)
-		ref = std::make_shared<PacketReference>();
+		ref = std::make_unique<PacketReference>();
 
 	ref->name = name;
 
@@ -159,8 +168,8 @@ std::shared_ptr<Reference> Parser::parseReference() {
 }
 
 
-std::shared_ptr<RepeatOperation> Parser::parseRepeatOperation() {
-	std::shared_ptr<RepeatOperation> op;
+std::unique_ptr<RepeatOperation> Parser::parseRepeatOperation() {
+	std::unique_ptr<RepeatOperation> op;
 
 	if ((op = parseSimpleRepeatOperation()) != nullptr)
 		return op;
@@ -171,9 +180,9 @@ std::shared_ptr<RepeatOperation> Parser::parseRepeatOperation() {
 	return nullptr;
 }
 
-std::shared_ptr<AltOperation> Parser::parseAltOperation() {
-	std::vector<std::shared_ptr<Block>> blocks;
-	std::shared_ptr<Block> b;
+std::unique_ptr<AltOperation> Parser::parseAltOperation() {
+	std::vector<std::unique_ptr<Block>> blocks;
+	std::unique_ptr<Block> b;
 
 	if (!consume(true, ALT_KEYWORD))
 		return nullptr;
@@ -184,7 +193,7 @@ std::shared_ptr<AltOperation> Parser::parseAltOperation() {
 	if ((b = parseBlock()) == nullptr)
 		return nullptr;
 
-	blocks.push_back(b);
+	blocks.push_back(std::move(b));
 
 	if (!consume(false, OR_KEYWORD))
 		return nullptr;
@@ -196,23 +205,23 @@ std::shared_ptr<AltOperation> Parser::parseAltOperation() {
 		if ((b = parseBlock()) == nullptr)
 			return nullptr;
 
-		blocks.push_back(b);
+		blocks.push_back(std::move(b));
 	} while (consume(true, OR_KEYWORD));
 
-	return std::make_shared<AltOperation>(blocks);
+	return std::make_unique<AltOperation>(blocks);
 }
 
-std::shared_ptr<SequenceReference> Parser::parseSequenceReference() {
+std::unique_ptr<SequenceReference> Parser::parseSequenceReference() {
 	if (!consume(true, OPEN_PARENT))
 		return nullptr;
 
 	if (!consume(false, CLOSE_PARENT))
 		return nullptr;
 
-	return std::make_shared<SequenceReference>();
+	return std::make_unique<SequenceReference>();
 }
 
-std::shared_ptr<RepeatOperation> Parser::parseSimpleRepeatOperation() {
+std::unique_ptr<RepeatOperation> Parser::parseSimpleRepeatOperation() {
 	unsigned int repeatFrom;
 	unsigned int repeatTo;
 
@@ -229,7 +238,7 @@ std::shared_ptr<RepeatOperation> Parser::parseSimpleRepeatOperation() {
 		return nullptr;
 	}
 
-	std::shared_ptr<Block> b;
+	std::unique_ptr<Block> b;
 
 	if (!consume(false, OPEN_BRACK))
 		return nullptr;
@@ -237,10 +246,10 @@ std::shared_ptr<RepeatOperation> Parser::parseSimpleRepeatOperation() {
 	if ((b = parseBlock()) == nullptr)
 		return nullptr;
 
-	return std::make_shared<RepeatOperation>(repeatFrom, repeatTo, b);
+	return std::make_unique<RepeatOperation>(repeatFrom, repeatTo, b);
 }
 
-std::shared_ptr<RepeatOperation> Parser::parseCompoundRepeatOperation() {
+std::unique_ptr<RepeatOperation> Parser::parseCompoundRepeatOperation() {
 	unsigned int repeatFrom;
 	unsigned int repeatTo;
 	bool readFrom = false;
@@ -277,7 +286,7 @@ std::shared_ptr<RepeatOperation> Parser::parseCompoundRepeatOperation() {
 	if (!consume(false, CLOSE_PARENT))
 		return nullptr;
 
-    std::shared_ptr<Block> b;
+    std::unique_ptr<Block> b;
 
     if (!consume(false, OPEN_BRACK))
     	return nullptr;
@@ -286,11 +295,11 @@ std::shared_ptr<RepeatOperation> Parser::parseCompoundRepeatOperation() {
         return nullptr;
     }
 
-    return std::make_shared<RepeatOperation>(repeatFrom, repeatTo, b);
+    return std::make_unique<RepeatOperation>(repeatFrom, repeatTo, b);
 }
 
-std::shared_ptr<Field> Parser::parseField() {
-	std::shared_ptr<Type> type;
+std::unique_ptr<Field> Parser::parseField() {
+	std::unique_ptr<Type> type;
 	std::string name;
 	bool isAssigned = false;
 	unsigned int valueAssigned;
@@ -312,12 +321,12 @@ std::shared_ptr<Field> Parser::parseField() {
 	if (!consume(false, SEMICOLON))
 		return nullptr;
 
-	return std::make_shared<Field>(type, name, isAssigned, valueAssigned);
+	return std::make_unique<Field>(std::move(type), name, isAssigned, valueAssigned);
 }
 
-std::shared_ptr<Type> Parser::parseType() {
+std::unique_ptr<Type> Parser::parseType() {
 	TokenType type;
-	std::shared_ptr<Expression> length;
+	std::unique_ptr<Expression> length;
 
 	if (!consumeType(true, type))
 		return nullptr;
@@ -331,21 +340,21 @@ std::shared_ptr<Type> Parser::parseType() {
 	if (!consume(false, CLOSE_PARENT))
 		return nullptr;
 
-	return std::make_shared<Type>(type, length);
+	return std::make_unique<Type>(type, length);
 }
 
-std::shared_ptr<Expression> Parser::parseExpression() {
-	std::shared_ptr<Operand> first;
-	std::vector<std::pair<TokenType, std::shared_ptr<Operand>>> rest;
+std::unique_ptr<Expression> Parser::parseExpression() {
+	std::unique_ptr<Operand> first;
+	std::vector<std::pair<TokenType, std::unique_ptr<Operand>>> rest;
 
 	unsigned int number;
 	std::string str;
 	TokenType type;
 
 	if (consumeNumber(true, number))
-		first = std::make_shared<Number>(number);
+		first = std::make_unique<Number>(number);
 	else if (consumeIdentifier(true, str))
-		first = std::make_shared<Identifier>(str);
+		first = std::make_unique<Identifier>(str);
 	else {
 		src.raiseError("Expected identifier or number before " +
 		               strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
@@ -356,9 +365,9 @@ std::shared_ptr<Expression> Parser::parseExpression() {
 
 	while (consumeOperator(true, type)) {
 		if (consumeNumber(true, number)) {
-			rest.push_back(std::make_pair(type, std::make_shared<Number>(number)));
+			rest.push_back(std::make_pair(type, std::make_unique<Number>(number)));
 		} else if (consumeIdentifier(true, str))
-			rest.push_back(std::make_pair(type, std::make_shared<Identifier>(str)));
+			rest.push_back(std::make_pair(type, std::make_unique<Identifier>(str)));
 		else {
 			src.raiseError("Expected identifier or number before " +
 			               strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
@@ -368,7 +377,7 @@ std::shared_ptr<Expression> Parser::parseExpression() {
 		}
 	}
 
-	return std::make_shared<Expression>(first, rest);
+	return std::make_unique<Expression>(first, rest);
 }
 
 bool Parser::consume(bool isPermissive, TokenType expected) {

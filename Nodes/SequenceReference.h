@@ -9,7 +9,7 @@
 
 class SequenceReference : public Reference {
 public:
-	static std::unordered_map<std::string, std::shared_ptr<Sequence>> sequenceMap;
+	static std::unordered_map<std::string, std::unique_ptr<Sequence>> sequenceMap;
 
 	bool execute(std::deque<std::string> &callQueue, unsigned int depth,
 	                  unsigned int &positionPointer);

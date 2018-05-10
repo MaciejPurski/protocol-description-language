@@ -19,7 +19,7 @@ bool Field::isDependent() {
 	if (type->length->first->getType() == IDENT)
 		return true;
 
-	for (auto op : type->length->rest) {
+	for (const auto &op : type->length->rest) {
 		if (op.second->getType() == IDENT) {
 			return true;
 		}
@@ -29,5 +29,5 @@ bool Field::isDependent() {
 }
 
 unsigned int Field::getLength() {
-
+	return 0;
 }

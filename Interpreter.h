@@ -9,26 +9,26 @@
 #include "Nodes/Packet.h"
 #include "Nodes/Protocol.h"
 #include "Analyzer/PacketsParser.h"
+#include <memory>
 
 class Interpreter {
 private:
 	Source src;
 	Scanner s;
 	Parser p;
-	PacketsParser packetsParser;
+	std::shared_ptr<PacketsParser> packetsParser;
 	bool assignedPid;
 	bool interpretPackets;
 	unsigned int pidOffset;
-	std::shared_ptr<Protocol> prot;
-	std::unordered_map<std::string, std::shared_ptr<Packet>> packetsMap;
-	std::unordered_map<uint64_t, std::shared_ptr<Packet>> pidMap;
-
+	unsigned int pidLength;
+	std::unique_ptr<Protocol> prot;
+	const char *fileName;
 
 	bool fillPacketsMap();
 	bool fillSequenceMap();
 
 public:
-	Interpreter(const char *srcFile, const char *protocolFile, bool ninterpretPackets) : src(srcFile, false), s(src), p(s, src), packetsParser(protocolFile),
+	Interpreter(const char *srcFile, const char *protocolFile, bool ninterpretPackets) : src(srcFile, false), fileName(protocolFile), s(src), p(s, src),
 	interpretPackets(ninterpretPackets) { }
 
 	void start() {
@@ -44,7 +44,7 @@ public:
 			return;
 
 		// TODO: different pids
-		packetsParser.parsePackets(pidMap, 0, 1);
+		packetsParser->parsePackets();
 
 		if (interpretPackets) {
 			std::deque<std::string> callQueue;
@@ -62,21 +62,19 @@ public:
 			for (const auto &str : callQueue)
 				std::cout << str << std::endl;
 
-			if (position != packetsParser.getNPackets()) {
+			if (position != packetsParser->getNPackets()) {
 				std::cout << strToRed("Packets left unrecognized") << std::endl;
 			}
 
 		} else {
-			packetsParser.showPacket();
+			packetsParser->showPacket();
 		}
-
-
 
 	}
 
-	bool findPacketPid(std::shared_ptr<Packet> p);
+	bool findPacketPid(std::unique_ptr<Packet> p);
 
-	bool checkPacketFields(std::shared_ptr<Packet> p);
+	bool checkPacketFields(const std::unique_ptr<Packet> &p);
 };
 
 

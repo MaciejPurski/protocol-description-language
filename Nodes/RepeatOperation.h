@@ -8,14 +8,14 @@ class RepeatOperation : public Operation {
 public:
 	unsigned int repeatFrom;
 	unsigned int repeatTo;
-	std::shared_ptr<Block> block;
+	std::unique_ptr<Block> block;
 	void traverseParseTree(int level);
 	bool execute(std::deque<std::string> &callQueue, unsigned int depth,
 	                  unsigned int &pointerPosition);
 
-	RepeatOperation(unsigned int from, unsigned int to, std::shared_ptr<Block> &b) : repeatFrom(from),
+	RepeatOperation(unsigned int from, unsigned int to, std::unique_ptr<Block> &b) : repeatFrom(from),
 	                                                                                 repeatTo(to),
-	                                                                                 block(b) {}
+	                                                                                 block(std::move(b)) {}
 
 };
 

@@ -1,7 +1,7 @@
 #include "PacketReference.h"
 #include "../Colors.h"
 
-PacketsParser *PacketReference::parser = nullptr;
+std::shared_ptr<PacketsParser> PacketReference::parser = nullptr;
 
 void PacketReference::traverseParseTree(int level) {
 	for (int i = 0; i < level; i++)

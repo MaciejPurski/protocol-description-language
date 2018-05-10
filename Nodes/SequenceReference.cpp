@@ -1,6 +1,6 @@
 #include "SequenceReference.h"
 
-std::unordered_map<std::string, std::shared_ptr<Sequence>> SequenceReference::sequenceMap;
+std::unordered_map<std::string, std::unique_ptr<Sequence>> SequenceReference::sequenceMap;
 
 void SequenceReference::traverseParseTree(int level) {
 	for (int i = 0; i < level; i++)

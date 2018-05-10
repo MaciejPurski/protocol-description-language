@@ -11,19 +11,18 @@ void Packet::traverseParseTree(int level) {
 
 	std::cout << std::endl;
 
-	for (auto f : fields)
+	for (const auto &f : fields)
 		f->traverseParseTree(level + 1);
 
 }
 
-bool Packet::setPid(bool &assignedPid, unsigned int &pidOffset) {
+bool Packet::setPid(bool &assignedPid, unsigned int &pidOffset, unsigned int &pidLength) {
 	unsigned int offset = 0;
 
-	for (auto f : fields) {
+	for (const auto &f : fields) {
 		if (f->name == "pid") {
 			if (!assignedPid) {
 				assignedPid = true;
-				pidOffset = offset;
 			} else if (offset != pidOffset) {
 				std::cerr << "Pid offset of packet: " << strToWhite("'" + name + "'") << " differs from others" << "\n";
 				return false;
@@ -34,7 +33,10 @@ bool Packet::setPid(bool &assignedPid, unsigned int &pidOffset) {
 				return false;
 			}
 
-			pid = f;
+			pid = f->assignedValue;
+			// TODO: variable pid length
+			pidLength = 1;
+			pidOffset = offset;
 			return true;
 		}
 
@@ -51,6 +53,6 @@ bool Packet::setPid(bool &assignedPid, unsigned int &pidOffset) {
 	return false;
 }
 
-unsigned int Packet::evaluateFieldLength(std::shared_ptr<Field> field) {
+unsigned int Packet::evaluateFieldLength(std::unique_ptr<Field> field) {
 
 }

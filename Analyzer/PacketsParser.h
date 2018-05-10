@@ -1,15 +1,14 @@
 #ifndef PROTOCOL_DESCRIPTION_LANGUAGE_PACKETSPARSER_H
 #define PROTOCOL_DESCRIPTION_LANGUAGE_PACKETSPARSER_H
 
-
-#include <fstream>
-#include <unordered_map>
 #include "AnalyzerPacket.h"
+#include "../Nodes/Packet.h"
+#include <unordered_map>
+#include <fstream>
+
 
 class PacketsParser {
 private:
-	std::vector<AnalyzerPacket> packets;
-	std::fstream file;
 	unsigned int currentPosition = 0;
 
 	uint64_t parseUInt(char *buf, unsigned int size);
@@ -21,15 +20,20 @@ private:
 	void getBytes(std::vector<char> &buf, unsigned int n);
 
 
+	std::vector<AnalyzerPacket> packets;
+	std::fstream file;
+	std::unordered_map<uint64_t, std::unique_ptr<Packet>> pidMap;
+	unsigned int pidOffset;
+	unsigned int pidLength;
 public:
-	PacketsParser(const char *fname);
+	PacketsParser(const char *fileName, std::unordered_map<uint64_t, std::unique_ptr<Packet>> pidMap,
+	              unsigned int pidOffset, unsigned int pidLength);
 
-	void parsePackets(std::unordered_map<uint64_t, std::shared_ptr<Packet>> &pidMap,
-	                  unsigned int pidOffset, unsigned int pidLenth);
+	void parsePackets();
 
 	void showPacket();
 
-	unsigned int evaluateFieldLength(std::vector<AnalyzerField> &fields, std::shared_ptr<Field> f);
+	unsigned int evaluateFieldLength(std::vector<AnalyzerField> &fields, std::unique_ptr<Field> &f);
 
 	const AnalyzerPacket &getPacket() {
 		if (currentPosition < packets.size())
@@ -66,4 +70,4 @@ public:
 };
 
 
-#endif //PROTOCOL_DESCRIPTION_LANGUAGE_PACKETSPARSER_H
+#endif

@@ -36,12 +36,12 @@ struct Identifier : public Operand {
 
 class Expression : public Node {
 public:
-	std::shared_ptr<Operand> first;
+	std::unique_ptr<Operand> first;
 
-	std::vector<std::pair<TokenType, std::shared_ptr<Operand>>> rest;
+	std::vector<std::pair<TokenType, std::unique_ptr<Operand>>> rest;
 
-	Expression(std::shared_ptr<Operand> &nfirst, std::vector<std::pair<TokenType, std::shared_ptr<Operand>>> &nargs) :
-			first(nfirst), rest(nargs) {}
+	Expression(std::unique_ptr<Operand> &nfirst, std::vector<std::pair<TokenType, std::unique_ptr<Operand>>> &nargs) :
+			first(std::move(nfirst)), rest(std::move(nargs)) {}
 
 	void traverseParseTree(int level);
 };

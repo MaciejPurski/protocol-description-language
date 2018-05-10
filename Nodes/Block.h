@@ -3,18 +3,18 @@
 
 #include <memory>
 #include <vector>
-#include <bits/shared_ptr.h>
+#include <bits/unique_ptr.h>
 #include <iostream>
 #include "Operation.h"
 #include "Node.h"
 
 class Block : public Node, Executable {
 public:
-	std::vector<std::shared_ptr<Operation>> operations;
+	std::vector<std::unique_ptr<Operation>> operations;
 
 	bool execute(std::deque<std::string> &callQueue, unsigned int depth,
 	             unsigned int &pointerPosition);
-	Block(std::vector<std::shared_ptr<Operation>> &o) : operations(o) { }
+	Block(std::vector<std::unique_ptr<Operation>> &o) : operations(std::move(o)) { }
 
 	void traverseParseTree(int level);
 };

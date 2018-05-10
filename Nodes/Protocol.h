@@ -3,19 +3,19 @@
 
 #include <vector>
 #include <memory>
-#include <bits/shared_ptr.h>
+#include <bits/unique_ptr.h>
 #include "Packet.h"
 #include "Sequence.h"
 #include "Node.h"
 
 class Protocol : public Node {
 public:
-	std::vector<std::shared_ptr<Packet>> packets;
-	std::vector<std::shared_ptr<Sequence>> sequences;
-	std::shared_ptr<Sequence> protocol;
+	std::vector<std::unique_ptr<Packet>> packets;
+	std::vector<std::unique_ptr<Sequence>> sequences;
+	std::unique_ptr<Sequence> protocol;
 
-	Protocol(std::vector<std::shared_ptr<Packet>> &p, std::vector<std::shared_ptr<Sequence>> &s, std::shared_ptr<Sequence> &prot) :
-			packets(p), sequences(s), protocol(prot) {}
+	Protocol(std::vector<std::unique_ptr<Packet>> &p, std::vector<std::unique_ptr<Sequence>> &s, std::unique_ptr<Sequence> &prot) :
+			packets(std::move(p)), sequences(std::move(s)), protocol(std::move(prot)) {}
 
 	void traverseParseTree(int level);
 };

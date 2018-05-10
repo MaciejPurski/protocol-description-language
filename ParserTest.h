@@ -14,7 +14,7 @@ public:
 	}
 
 	void start() {
-		std::shared_ptr<Protocol> prot = p.parse();
+		std::unique_ptr<Protocol> prot = p.parse();
 
 		if (prot != nullptr)
 			prot->traverseParseTree(0);

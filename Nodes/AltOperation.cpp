@@ -7,14 +7,14 @@ void AltOperation::traverseParseTree(int level) {
 
 	std::cout << "ALT OPERATION\n";
 
-	for (auto b : blocks)
+	for (const auto &b : blocks)
 		b->traverseParseTree(level + 1);
 }
 
 bool AltOperation::execute(std::deque<std::string> &callQueue, unsigned int depth,
                            unsigned int &pointerPosition) {
 
-	for (auto &b : blocks) {
+	for (const auto &b : blocks) {
 		if (b->execute(callQueue, depth, pointerPosition))
 			return true;
 	}

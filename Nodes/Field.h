@@ -10,18 +10,20 @@
 class Field : public Node {
 public:
 	void traverseParseTree(int level);
-	std::shared_ptr<Type> type;
+	std::unique_ptr<Type> type;
 	std::string name;
 	bool isAssigned;
 	int assignedValue;
 	bool isDependent();
 
-	Field(std::shared_ptr<Type> &type, std::string &name, bool isAssigned, int assignedValue) : type(type),
+	Field(std::unique_ptr<Type> type, std::string &name, bool isAssigned, int assignedValue) :
 	                                                                                                        name(name),
 	                                                                                                        isAssigned(
 			                                                                                                        isAssigned),
 	                                                                                                        assignedValue(
-			                                                                                                        assignedValue) {}
+			                                                                                                        assignedValue) {
+		this->type = std::move(type);
+	}
 	unsigned int getLength();
 
 };

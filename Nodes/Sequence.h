@@ -10,9 +10,9 @@ public:
 	bool execute(std::deque<std::string> &callDeque, unsigned int depth,
 	             unsigned int &pointerPosition);
 	std::string name;
-	std::shared_ptr<Block> block;
+	std::unique_ptr<Block> block;
 
-	Sequence(std::string &n, std::shared_ptr<Block> &b) : name(n), block(b) {}
+	Sequence(std::string &n, std::unique_ptr<Block> &b) : name(n), block(std::move(b)) {}
 	void traverseParseTree(int level);
 };
 
