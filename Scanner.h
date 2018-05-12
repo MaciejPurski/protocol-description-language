@@ -38,6 +38,12 @@ public:
 	explicit Scanner(Source &s);
 	Token nextToken();
 	static std::string tokenToString(TokenType t);
+
+	Token getIdentifierToken();
+
+	Token getHexadecimalToken();
+
+	Token getDecimalToken();
 };
 
 

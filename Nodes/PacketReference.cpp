@@ -10,6 +10,7 @@ void PacketReference::traverseParseTree(int level) {
 	std::cout << "PACKET REFERENCE name: " << Reference::name << std::endl;
 }
 
+//TODO: interfejs do zrodla danych
 bool PacketReference::execute(std::deque<std::string> &callQueue, unsigned int depth,
                                    unsigned int &pointerPosition) {
 

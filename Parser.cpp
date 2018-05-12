@@ -18,6 +18,7 @@ std::unique_ptr<Protocol> Parser::parse() {
 	/* Protocol might consist of packets and sequences,
 	 * therefore we try to parse them until it is possible
 	 */
+	//TODO: while()
 	do {
 		added = false;
 
@@ -57,6 +58,7 @@ std::unique_ptr<Sequence> Parser::parseSequence() {
 	if (!consumeIdentifier(false, name))
 		return nullptr;
 
+	// THROW
 	if (!consume(false, OPEN_BRACK))
 		return nullptr;
 
@@ -72,6 +74,8 @@ std::unique_ptr<Block> Parser::parseBlock() {
 	std::vector<std::unique_ptr<Operation>> operations;
 	std::unique_ptr<Operation> o;
 
+	//TODO: OPEN_BRACK
+
 	while ((o = parseOperation()) != nullptr)
 		operations.push_back(std::move(o));
 
@@ -86,8 +90,9 @@ std::unique_ptr<Sequence> Parser::parseProtocol() {
 	std::string name;
 	std::vector<std::unique_ptr<Operation>> operations;
 
+	//TODO: common
 	// sequence must begin with a "sequence" keyword
-	if (!consume(false, PROTOCOL_KEYWORD))
+	if (!consume(true, PROTOCOL_KEYWORD))
 		return nullptr;
 
 	if (!consumeIdentifier(false, name))
@@ -198,6 +203,8 @@ std::unique_ptr<AltOperation> Parser::parseAltOperation() {
 	if (!consume(false, OR_KEYWORD))
 		return nullptr;
 
+
+	//TODO while zamiast do - while
 	do  {
 		if (!consume(false, OPEN_BRACK))
 			return nullptr;
@@ -363,6 +370,7 @@ std::unique_ptr<Expression> Parser::parseExpression() {
 		return nullptr;
 	}
 
+	// TODO: parse operands
 	while (consumeOperator(true, type)) {
 		if (consumeNumber(true, number)) {
 			rest.push_back(std::make_pair(type, std::make_unique<Number>(number)));
@@ -454,6 +462,7 @@ bool Parser::consumeType(bool isPermissive, enum TokenType &type) {
 	return true;
 }
 
+//parse operand
 bool Parser::consumeOperator(bool isPermissive, TokenType &type) {
 	if (token.type != ADD_OPERATOR && token.type != MUL_OPERATOR && token.type != SUBTR_OPERATOR) {
 

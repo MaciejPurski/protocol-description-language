@@ -36,6 +36,7 @@ struct Identifier : public Operand {
 
 class Expression : public Node {
 public:
+	//TODO: osobne vectory operandow i operatorow
 	std::unique_ptr<Operand> first;
 
 	std::vector<std::pair<TokenType, std::unique_ptr<Operand>>> rest;

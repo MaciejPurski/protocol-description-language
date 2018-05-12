@@ -92,8 +92,6 @@ std::string PacketsParser::parseString(char *buf, unsigned int size) {
 void PacketsParser::getBytes(std::vector<char> &buf, unsigned int n) {
 	int c;
 
-	std::cout << "getBytes: " << n << std::endl;
-
 	for (unsigned int i = 0; i < n; i++) {
 		c = file.get();
 
