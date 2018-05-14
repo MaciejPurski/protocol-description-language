@@ -2,7 +2,7 @@
 #include <climits>
 #include <cstdarg>
 #include "Parser.h"
-#include "Colors.h"
+#include "Utils.h"
 #include "Nodes/PacketReference.h"
 
 std::unique_ptr<Protocol> Parser::parse() {
@@ -13,27 +13,18 @@ std::unique_ptr<Protocol> Parser::parse() {
 	std::unique_ptr<Packet> p;
 	std::unique_ptr<Sequence> s;
 
-	bool added = false;
 
 	/* Protocol might consist of packets and sequences,
 	 * therefore we try to parse them until it is possible
 	 */
-	//TODO: while()
-	do {
-		added = false;
-
-		if ((p = parsePacket()) != nullptr) {
+	while ((p = parsePacket()) != nullptr ||
+			(s = parseSequence()) != nullptr) {
+		if (p != nullptr)
 			packets.emplace_back(std::move(p));
-			added = true;
-		}
 
-		if ((s = parseSequence()) != nullptr) {
+		if (s != nullptr)
 			sequences.emplace_back(std::move(s));
-			added = true;
-		}
-
-
-	} while (added);
+	}
 
 	if (src.getNErrors() > 0) {
 		std::cout << "parsing failed\n";
@@ -58,14 +49,10 @@ std::unique_ptr<Sequence> Parser::parseSequence() {
 	if (!consumeIdentifier(false, name))
 		return nullptr;
 
-	// THROW
-	if (!consume(false, OPEN_BRACK))
-		return nullptr;
-
 	std::unique_ptr<Block> block = parseBlock();
 
 	if (block == nullptr)
-		return nullptr;
+		throw std::runtime_error("Expected protocol definition");
 
 	return std::make_unique<Sequence>(name, block);
 }
@@ -74,7 +61,8 @@ std::unique_ptr<Block> Parser::parseBlock() {
 	std::vector<std::unique_ptr<Operation>> operations;
 	std::unique_ptr<Operation> o;
 
-	//TODO: OPEN_BRACK
+	if (!consume(true, OPEN_BRACK))
+		return nullptr;
 
 	while ((o = parseOperation()) != nullptr)
 		operations.push_back(std::move(o));
@@ -96,9 +84,6 @@ std::unique_ptr<Sequence> Parser::parseProtocol() {
 		return nullptr;
 
 	if (!consumeIdentifier(false, name))
-		return nullptr;
-
-	if (!consume(false, OPEN_BRACK))
 		return nullptr;
 
 	std::unique_ptr<Block> block = parseBlock();
@@ -159,13 +144,13 @@ std::unique_ptr<Reference> Parser::parseReference() {
 	if (!consumeIdentifier(true, name))
 		return nullptr;
 
+	// try to parse sequence reference, if it fails, treat it as a packet reference
 	ref = parseSequenceReference();
-
 	if (ref == nullptr)
 		ref = std::make_unique<PacketReference>();
 
+	// reference name is a common field of packet reference and sequence reference
 	ref->name = name;
-
 	if (!consume(false, SEMICOLON))
 		return nullptr;
 
@@ -192,25 +177,18 @@ std::unique_ptr<AltOperation> Parser::parseAltOperation() {
 	if (!consume(true, ALT_KEYWORD))
 		return nullptr;
 
-	if (!consume(false, OPEN_BRACK))
-		return nullptr;
-
 	if ((b = parseBlock()) == nullptr)
-		return nullptr;
+		throw std::runtime_error("Expected block");
 
 	blocks.push_back(std::move(b));
 
+	// need at least one "or" statement
 	if (!consume(false, OR_KEYWORD))
 		return nullptr;
 
-
-	//TODO while zamiast do - while
 	do  {
-		if (!consume(false, OPEN_BRACK))
-			return nullptr;
-
 		if ((b = parseBlock()) == nullptr)
-			return nullptr;
+			throw std::runtime_error("Expected block");
 
 		blocks.push_back(std::move(b));
 	} while (consume(true, OR_KEYWORD));
@@ -247,9 +225,6 @@ std::unique_ptr<RepeatOperation> Parser::parseSimpleRepeatOperation() {
 
 	std::unique_ptr<Block> b;
 
-	if (!consume(false, OPEN_BRACK))
-		return nullptr;
-
 	if ((b = parseBlock()) == nullptr)
 		return nullptr;
 
@@ -260,8 +235,6 @@ std::unique_ptr<RepeatOperation> Parser::parseCompoundRepeatOperation() {
 	unsigned int repeatFrom;
 	unsigned int repeatTo;
 	bool readFrom = false;
-	bool commaSeperated = false;
-	bool readTo = false;
 
 	if (!consume(true, REPEAT_KEYWORD))
 		return nullptr;
@@ -277,7 +250,6 @@ std::unique_ptr<RepeatOperation> Parser::parseCompoundRepeatOperation() {
 
 	// if there is a comma, we might try to consume a second number
 	if (consume(true, COMMA)) {
-	    commaSeperated = true;
 
 	    // if there is no second number after a comma
 	    if (!consumeNumber(true, repeatTo))
@@ -295,12 +267,8 @@ std::unique_ptr<RepeatOperation> Parser::parseCompoundRepeatOperation() {
 
     std::unique_ptr<Block> b;
 
-    if (!consume(false, OPEN_BRACK))
-    	return nullptr;
-
-    if ((b = parseBlock()) == nullptr) {
-        return nullptr;
-    }
+    if ((b = parseBlock()) == nullptr)
+        throw std::runtime_error("Expected block");
 
     return std::make_unique<RepeatOperation>(repeatFrom, repeatTo, b);
 }
@@ -351,41 +319,40 @@ std::unique_ptr<Type> Parser::parseType() {
 }
 
 std::unique_ptr<Expression> Parser::parseExpression() {
-	std::unique_ptr<Operand> first;
-	std::vector<std::pair<TokenType, std::unique_ptr<Operand>>> rest;
+	std::vector<std::unique_ptr<Operand>> operands;
+	std::vector<TokenType> operators;
+	std::unique_ptr<Operand> op;
+	TokenType t;
 
-	unsigned int number;
-	std::string str;
-	TokenType type;
 
-	if (consumeNumber(true, number))
-		first = std::make_unique<Number>(number);
-	else if (consumeIdentifier(true, str))
-		first = std::make_unique<Identifier>(str);
-	else {
-		src.raiseError("Expected identifier or number before " +
-		               strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
-		nextToken();
-
+	if ((op = parseOperand()) == nullptr)
 		return nullptr;
+
+	operands.push_back(std::move(op));
+
+	while (consumeOperator(true, t)) {
+		operators.push_back(t);
+
+		if ((op = parseOperand()) == nullptr)
+			throw std::runtime_error("Expected operand");
+
+		operands.push_back(std::move(op));
 	}
 
-	// TODO: parse operands
-	while (consumeOperator(true, type)) {
-		if (consumeNumber(true, number)) {
-			rest.push_back(std::make_pair(type, std::make_unique<Number>(number)));
-		} else if (consumeIdentifier(true, str))
-			rest.push_back(std::make_pair(type, std::make_unique<Identifier>(str)));
-		else {
-			src.raiseError("Expected identifier or number before " +
-			               strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
-			nextToken();
+	return std::make_unique<Expression>(std::move(operands), operators);
+}
 
-			return nullptr;
-		}
-	}
+std::unique_ptr<Operand> Parser::parseOperand() {
+	std::string str;
+	unsigned int value;
 
-	return std::make_unique<Expression>(first, rest);
+	if (consumeNumber(true, value))
+		return std::make_unique<Number>(value);
+
+	if (consumeIdentifier(true, str))
+		return std::make_unique<Identifier>(str);
+
+	return nullptr;
 }
 
 bool Parser::consume(bool isPermissive, TokenType expected) {
@@ -397,8 +364,8 @@ bool Parser::consume(bool isPermissive, TokenType expected) {
 
 	// report an error
 	if (!isPermissive) {
-		src.raiseError("Expected " + strToWhite("'" + Scanner::tokenToString(expected) + "'") + " before " +
-		               strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
+		src.raiseError("Expected " + strToWhite("'" + tokenToString(expected) + "'") + " before " +
+		               strToWhite("'" + tokenToString(token.type) + "'"), token);
 
 		nextToken();
 	}
@@ -413,7 +380,7 @@ bool Parser::consumeIdentifier(bool isPermissive, std::string &str) {
 		return true;
 	} else if (!isPermissive) {
 		src.raiseError("Expected identifier before " +
-		               strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
+		               strToWhite("'" + tokenToString(token.type) + "'"), token);
 
 		nextToken();
 
@@ -431,7 +398,7 @@ bool Parser::consumeNumber(bool isPermissive, unsigned int &number) {
 
 	if (!isPermissive) {
 		src.raiseError("Expected identifier before " +
-		               strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
+		               strToWhite("'" + tokenToString(token.type) + "'"), token);
 
 		nextToken();
 	}
@@ -445,7 +412,7 @@ bool Parser::consumeType(bool isPermissive, enum TokenType &type) {
 
 		if (!isPermissive) {
 			src.raiseError("Expected identifier before " +
-			               strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
+			               strToWhite("'" + tokenToString(token.type) + "'"), token);
 
 			nextToken();
 		}
@@ -468,7 +435,7 @@ bool Parser::consumeOperator(bool isPermissive, TokenType &type) {
 
 		if (!isPermissive) {
 			src.raiseError("Expected operator before " +
-			               strToWhite("'" + Scanner::tokenToString(token.type) + "'"), token);
+			               strToWhite("'" + tokenToString(token.type) + "'"), token);
 
 			nextToken();
 		}

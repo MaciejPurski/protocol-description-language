@@ -1,44 +1,43 @@
 #include <iostream>
 #include "Expression.h"
-#include "../Scanner.h"
+#include "../Utils.h"
 
 
 void Expression::traverseParseTree(int level) {
 	for (int i = 0; i < level; i++)
 		std::cout << '-';
 
-	Number *n;
-	Identifier *i;
-
 	std::cout << "Expression: ";
 
-	OperandType t = first->getType();
-	switch (t) {
-		case NUMBER:
-			n = static_cast<Number*>(first.get());
-			std::cout << "number: " << n->value << " ";
-			break;
-		case IDENT:
-			i = static_cast<Identifier*>(first.get());
-			std::cout << "identifier: " << i->str << " ";
-			break;
-	}
+	std::cout << "OPERATORS: ";
+	for (auto &op : operators)
+		std::cout << tokenToString(op) << " ";
 
-	for (const auto &op : rest) {
-		std::cout << "operator: " << Scanner::tokenToString(op.first) << " ";
+	std::cout << "OPERANDS: ";
+	for (auto &opd : operands)
+		opd->traverseParseTree(level + 1);
 
-		t = op.second->getType();
-		switch (t) {
-			case NUMBER:
-				n = static_cast<Number*>(op.second.get());
-				std::cout << "number: " << n->value << " ";
+	std::cout << std::endl;
+}
+
+unsigned long Expression::evaluate(std::vector<AnalyzerField> &fields) {
+	unsigned long value = operands.front()->getValue(fields);
+
+	for (unsigned int i = 0; i < operators.size(); i++) {
+		switch (operators[i]) {
+			case MUL_OPERATOR:
+				value *= operands[i + 1]->getValue(fields);
 				break;
-			case IDENT:
-				i = static_cast<Identifier*>(op.second.get());
-				std::cout << "identifier: " << i->str << " ";
+			case ADD_OPERATOR:
+				value += operands[i + 1]->getValue(fields);
 				break;
+			case SUBTR_OPERATOR:
+				value -= operands[i + 1]->getValue(fields);
+				break;
+			default:
+				throw std::runtime_error("Unkown operator");
 		}
 	}
 
-	std::cout << std::endl;
+	return value;
 }

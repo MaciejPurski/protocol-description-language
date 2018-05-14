@@ -1,6 +1,8 @@
-#ifndef PROTOCOL_DESCRIPTION_LANGUAGE_COLORS_H
-#define PROTOCOL_DESCRIPTION_LANGUAGE_COLORS_H
+#ifndef PROTOCOL_DESCRIPTION_LANGUAGE_UTILS_H
+#define PROTOCOL_DESCRIPTION_LANGUAGE_UTILS_H
 #include <string>
+#include <vector>
+#include "Token.h"
 
 static inline std::string strToRed(const std::string &str) {
 #ifdef __unix__
@@ -34,4 +36,15 @@ static inline std::string strToBlue(const std::string &str) {
 #endif
 }
 
-#endif //PROTOCOL_DESCRIPTION_LANGUAGE_COLORS_H
+static inline std::string tokenToString(TokenType t) {
+	static std::vector<std::string> arr = {
+			"packet", "sequence", "protocol", "iterate", "do_iterate", "alt", "or", "opt", "repeat",
+			"int", "uint", "bytes", "string", "bits", "+",
+			"-", "*", "(", ")", "{", "}",
+			";", "=", "decimal number", "hexadecimal number", ",", "END", "UNKNOWN", "identifier"
+	};
+
+	return arr[t];
+}
+
+#endif

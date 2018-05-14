@@ -10,6 +10,7 @@ void PacketsParser::parsePackets() {
 		file.unget();
 		getBytes(buf, pidOffset);
 
+		//TODO: different pid offsets
 		// now read pid
 		getBytes(buf, pidLength);
 
@@ -18,9 +19,11 @@ void PacketsParser::parsePackets() {
 		auto it = pidMap.find(pid);
 
 		if (it == pidMap.end()) {
-			std::cout << "Unknown packet encountered\n";
+			std::cout << "Unknown packet encountered pid: " << pid << std::endl;
 			return;
 		}
+
+		std::vector<std::unique_ptr<Field>> &fields = it->second->fields;
 
 		parsedFields.push_back(AnalyzerField("pid", UINT_TYPE, pidLength));
 		parsedFields.back().uintVal = pid;
@@ -30,11 +33,11 @@ void PacketsParser::parsePackets() {
 		// parse fields
 
 		unsigned int currentOffset = pidOffset + pidLength;
-		std::vector<std::unique_ptr<Field>> &fields = it->second->fields;
+
 
 		for (unsigned int i = 1; i < fields.size(); i++) {
 			std::vector<char> fieldBuf;
-			unsigned int fieldLength = evaluateFieldLength(parsedFields, fields[i]);
+			unsigned long fieldLength = fields[i]->type->length->evaluate(parsedFields);
 
 			// add a new field
 			parsedFields.push_back(AnalyzerField(fields[i]->name,
@@ -106,70 +109,6 @@ void PacketsParser::getBytes(std::vector<char> &buf, unsigned int n) {
 void PacketsParser::showPacket() {
 	for (auto p : packets)
 		p.show();
-}
-
-unsigned int PacketsParser::evaluateFieldLength(std::vector<AnalyzerField> &fields, std::unique_ptr<Field> &field) {
-	unsigned int result = 0;
-	Number *n;
-	Identifier *i;
-
-	OperandType t = field->type->length->first->getType();
-
-	switch (t) {
-		case NUMBER:
-			n = static_cast<Number*>(field->type->length->first.get());
-			result += n->value;
-			break;
-		case IDENT:
-			i = static_cast<Identifier*>(field->type->length->first.get());
-
-			// look for a dependent field
-			for (auto f : fields) {
-				// found
-				if (f.name == i->str) {
-					if (f.type == UINT_TYPE)
-						result += f.uintVal;
-					else
-						result += f.intVal;
-				}
-			}
-			break;
-	}
-
-	for (auto &op : field->type->length->rest) {
-		t = op.second->getType();
-		unsigned int val;
-
-		switch (t) {
-			case NUMBER:
-				n = static_cast<Number*>(op.second.get());
-				val = n->value;
-				break;
-			case IDENT:
-				i = static_cast<Identifier*>(op.second.get());
-				for (auto &f : fields) {
-					// found
-					if (f.name == i->str) {
-						val = f.length;
-					}
-				}
-				break;
-		}
-
-		switch (op.first) {
-			case ADD_OPERATOR:
-				result += val;
-				break;
-			case MUL_OPERATOR:
-				result *= val;
-				break;
-			case SUBTR_OPERATOR:
-				result -= val;
-				break;
-		}
-	}
-
-	return result;
 }
 
 PacketsParser::PacketsParser(const char *fileName,

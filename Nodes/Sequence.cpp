@@ -1,5 +1,5 @@
 #include "Sequence.h"
-#include "../Colors.h"
+#include "../Utils.h"
 
 void Sequence::traverseParseTree(int level) {
 	for (int i = 0; i < level; i++)

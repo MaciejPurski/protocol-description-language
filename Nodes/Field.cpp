@@ -16,11 +16,8 @@ void Field::traverseParseTree(int level) {
 }
 
 bool Field::isDependent() {
-	if (type->length->first->getType() == IDENT)
-		return true;
-
-	for (const auto &op : type->length->rest) {
-		if (op.second->getType() == IDENT) {
+	for (auto &op : type->length->operands) {
+		if (op->getType() == IDENT) {
 			return true;
 		}
 	}
@@ -29,5 +26,6 @@ bool Field::isDependent() {
 }
 
 unsigned int Field::getLength() {
+
 	return 0;
 }

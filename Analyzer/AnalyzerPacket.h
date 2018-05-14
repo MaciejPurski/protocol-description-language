@@ -4,7 +4,7 @@
 #include "AnalyzerField.h"
 #include <vector>
 #include <iostream>
-
+#include <algorithm>
 
 class AnalyzerPacket {
 public:
@@ -32,6 +32,7 @@ public:
 
 		std::cout << std::endl;
 	}
+
 
 };
 

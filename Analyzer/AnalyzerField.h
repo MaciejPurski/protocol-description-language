@@ -24,6 +24,10 @@ public:
 
 	std::string toStr() const;
 
+	uint64_t getUintVal() {
+		return uintVal;
+	}
+
 };
 
 

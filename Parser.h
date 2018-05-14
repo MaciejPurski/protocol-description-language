@@ -68,6 +68,8 @@ public:
 	std::unique_ptr<Protocol>  parse();
 
 	bool consumeNumber(bool isPermissive, unsigned int &number);
+
+	std::unique_ptr<Operand> parseOperand();
 };
 
 

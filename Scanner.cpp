@@ -53,9 +53,8 @@ Token Scanner::nextToken() {
 	}
 
 	// string constant
-	if (ch == '\"') {
+	if (ch == '\"')
 		return getConstStringToken(ch);
-	}
 
 	if (isalpha(ch))
 		return getIdentifierToken();
@@ -154,6 +153,8 @@ Token Scanner::getHexadecimalToken() {
 		//TODO: error
 	}
 
+	nextChar();
+
 	int value = 0;
 	unsigned int length = 0;
 	while (isHex(ch)) {
@@ -203,15 +204,4 @@ int Scanner::toHex(const int c) {
 		return c - 'a' + 10;
 
 	return -1;
-}
-
-std::string Scanner::tokenToString(TokenType t) {
-	static std::vector<std::string> arr = {
-			"packet", "sequence", "protocol", "iterate", "do_iterate", "alt", "or", "opt", "repeat",
-			"int", "uint", "bytes", "string", "bits", "+",
-			"-", "*", "(", ")", "{", "}",
-			";", "=", "decimal number", "hexadecimal number", ",", "END", "UNKNOWN", "identifier"
-	};
-
-	return arr[t];
 }

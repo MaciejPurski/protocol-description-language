@@ -3,23 +3,39 @@
 
 #include "../Token.h"
 #include "Node.h"
+#include "../Analyzer/AnalyzerField.h"
+#include "../Analyzer/AnalyzerPacket.h"
 #include <string>
 #include <vector>
 #include <memory>
 #include <iostream>
+#include <algorithm>
 
 enum OperandType {NUMBER, IDENT};
 
-struct Operand {
+struct Operand: public Node {
+	virtual void traverseParseTree(int level) = 0;
+	virtual unsigned long getValue(std::vector<AnalyzerField> &fields) = 0;
 	virtual OperandType getType() = 0;
 };
 
 struct Number : public Operand {
-	int value;
+	unsigned int value;
 
-	Number(int nValue) : value(nValue) { }
+	Number(unsigned int nValue) : value(nValue) { }
 
-	OperandType  getType() {
+	void traverseParseTree(int level) {
+		for (int i = 0; i < level; i++)
+			std::cout << "-";
+
+		std::cout << "NUMBER: " << value << std::endl;
+	}
+
+	unsigned long getValue(std::vector<AnalyzerField> &fields) {
+		return value;
+	}
+
+	OperandType getType() {
 		return NUMBER;
 	}
 };
@@ -27,22 +43,36 @@ struct Number : public Operand {
 struct Identifier : public Operand {
 	std::string str;
 
-	Identifier(std::string nStr) : str(nStr) { }
+	Identifier(std::string &nStr) : str(nStr) { }
 
-	OperandType  getType() {
+	void traverseParseTree(int level) {
+		for (int i = 0; i < level; i++)
+			std::cout << "-";
+
+		std::cout << "IDENTIFIER OPERAND: " << str << std::endl;
+	}
+	unsigned long getValue(std::vector<AnalyzerField> &fields) {
+		for (auto &f : fields)
+			if (f.name == str)
+				return f.getUintVal();
+
+		throw std::runtime_error("Unkown reference to field: " + str);
+	}
+
+	OperandType getType() {
 		return IDENT;
 	}
 };
 
 class Expression : public Node {
 public:
-	//TODO: osobne vectory operandow i operatorow
-	std::unique_ptr<Operand> first;
+	std::vector<std::unique_ptr<Operand>> operands;
+	std::vector<TokenType> operators;
 
-	std::vector<std::pair<TokenType, std::unique_ptr<Operand>>> rest;
+	Expression(std::vector<std::unique_ptr<Operand>> operands, std::vector<TokenType> operators) :
+			operands(std::move(operands)), operators(std::move(operators)) {}
 
-	Expression(std::unique_ptr<Operand> &nfirst, std::vector<std::pair<TokenType, std::unique_ptr<Operand>>> &nargs) :
-			first(std::move(nfirst)), rest(std::move(nargs)) {}
+	unsigned long evaluate(std::vector<AnalyzerField> &fields);
 
 	void traverseParseTree(int level);
 };
