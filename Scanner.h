@@ -13,6 +13,7 @@ class Scanner {
 private:
 	Source &src;
 	int begIndex;
+	Position position;
 	int ch; // current character
 	std::unordered_map<std::string, TokenType> keywordMap;
 	std::unordered_map<char, TokenType> separatorMap;
@@ -44,6 +45,10 @@ public:
 	Token getHexadecimalToken();
 
 	Token getDecimalToken();
+
+	void skipSpaces();
+
+	Token getOperatorToken();
 };
 
 

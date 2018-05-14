@@ -1,4 +1,4 @@
-protocol abc {
-	odt;
-	err
+protocol abxc {
+	odt
+	err;
 }

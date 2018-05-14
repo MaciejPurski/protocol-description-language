@@ -50,15 +50,15 @@ private:
 	std::unique_ptr<Expression> parseExpression();
 
 
-	bool consume(bool isPermissive, TokenType expected);
+	bool consume(TokenType expected, bool isPermissive);
 
 	bool consumeNumber(bool isPermissive, unsigned int *number);
 
-	bool consumeIdentifier(bool isPermissive, std::string &str);
+	bool consumeIdentifier(std::string &str, bool isPermissive);
 
-	bool consumeType(bool isPermissive, TokenType &type);
+	bool consumeType(enum TokenType &type, bool isPermissive);
 
-	bool consumeOperator(bool isPermissive, TokenType &type);
+	bool consumeOperator(TokenType &type, bool isPermissive);
 
 public:
 	Parser(Scanner &ns, Source &nsrc) : s(ns), src(nsrc) {
@@ -67,7 +67,7 @@ public:
 
 	std::unique_ptr<Protocol>  parse();
 
-	bool consumeNumber(bool isPermissive, unsigned int &number);
+	bool consumeNumber(unsigned int &number, bool isPermissive);
 
 	std::unique_ptr<Operand> parseOperand();
 };

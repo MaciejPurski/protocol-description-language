@@ -11,10 +11,11 @@ private:
 	std::string fileName;
 	std::fstream file;
 	bool testMode;
+	int prevChar;
 
 	unsigned int characterPosition;
 	unsigned int linePosition;
-	std::string lineBuffer;
+	unsigned int filePosition;
 	int nErrors;
 
 public:
@@ -25,6 +26,12 @@ public:
 	int getNErrors();
 	void printLine();
 	int getIndex();
+
+	unsigned int getPosition();
+
+	unsigned int getLineNumber();
+
+	unsigned int getColumn();
 };
 
 

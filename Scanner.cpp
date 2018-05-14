@@ -2,55 +2,14 @@
 #include "Scanner.h"
 
 Token Scanner::nextToken() {
-	while (isspace(ch) || ch == '#') {
-		nextChar();
+	skipSpaces();
 
-		if (ch == '#')
-			while (ch != '\n')
-				nextChar();
-	}
+	position.filePostiion = src.getPosition();
+	position.column = src.getColumn();
+	position.line = src.getLineNumber();
 
-	//TODO: column number
-	begIndex = src.getIndex();
-
-	if (ch == EOF) {
-		return Token(END, begIndex, 1);
-	}
-
-	switch (ch) {
-		case '+':
-			nextChar();
-			return Token(ADD_OPERATOR, begIndex, 1);
-		case '-':
-			nextChar();
-			return Token(SUBTR_OPERATOR, begIndex, 1);
-		case '*':
-			nextChar();
-			return Token(MUL_OPERATOR, begIndex, 1);
-		case '(':
-			nextChar();
-			return Token(OPEN_PARENT, begIndex, 1);
-		case ')':
-			nextChar();
-			return Token(CLOSE_PARENT, begIndex, 1);
-		case '{':
-			nextChar();
-			return Token(OPEN_BRACK, begIndex, 1);
-		case '}':
-			nextChar();
-			return Token(CLOSE_BRACK, begIndex, 1);
-		case ';':
-			nextChar();
-			return Token(SEMICOLON, begIndex, 1);
-		case '=':
-			nextChar();
-			return Token(ASSIGNMENT, begIndex, 1);
-		case ',':
-			nextChar();
-			return Token(COMMA, begIndex, 1);
-		default:
-			break;
-	}
+	if (ch == EOF)
+		return Token(END, position, 1);
 
 	// string constant
 	if (ch == '\"')
@@ -65,13 +24,7 @@ Token Scanner::nextToken() {
 	if (isdigit(ch))
 		return getDecimalToken();
 
-
-	Token t(UNKNOWN, begIndex, 1);
-
-	src.raiseError("Unknown token", t);
-	nextChar();
-
-	return t;
+	return getOperatorToken();
 }
 
 Scanner::Scanner(Source &s) : src(s) {
@@ -98,14 +51,6 @@ Scanner::Scanner(Source &s) : src(s) {
 	nextChar();
 }
 
-bool Scanner::isKeyword(const int c) {
-	return (keywordMap.find(std::string(1, ch)) != keywordMap.end());
-}
-
-bool Scanner::isSeparator(const int c) {
-	return (separatorMap.find(ch) != separatorMap.end());
-}
-
 Token Scanner::getIdentifierToken() {
 	std::string word;
 
@@ -118,9 +63,9 @@ Token Scanner::getIdentifierToken() {
 	auto it2 = keywordMap.find(word);
 
 	if (it2 == keywordMap.end()) // not a keyword
-		return Token(IDENTIFIER, begIndex, word.size(), word);
+		return Token(IDENTIFIER, position, word.size(), word);
 	else // a keyword
-		return Token(it2->second, begIndex, word.size());
+		return Token(it2->second, position, word.size());
 }
 
 Token Scanner::getDecimalToken() {
@@ -133,30 +78,46 @@ Token Scanner::getDecimalToken() {
 		length++;
 	}
 
-	if (isalpha(ch)) {
-		//TODO: invalid integer suffix
+	if (isalnum(ch)) {
+		while (isalnum(ch)) {
+			length++;
+			nextChar();
+		}
+
+		Token t(UNKNOWN, position, length);
+		src.raiseError("Invalid integer suffix", t);
+
+		throw std::runtime_error("Lexer error");
 	}
 
-	return Token(DEC_NUMBER, begIndex, length, "", value);
+	return Token(DEC_NUMBER, position, length, "", value);
 }
 
 Token Scanner::getHexadecimalToken() {
+	unsigned int length = 1;
 	// we know that we alread have '0' character
 	nextChar();
 
 	// decimal 0 value
-	if (!isalpha(ch)) {
-		return Token(DEC_NUMBER, begIndex, 0, "", 0);
-	}
+	if (!isalpha(ch))
+		return Token(DEC_NUMBER, position, 0, "", 0);
 
 	if (ch != 'x') {
-		//TODO: error
+		while (isalnum(ch)) {
+			length++;
+			nextChar();
+		}
+
+		Token t(UNKNOWN, position, length);
+		src.raiseError("Invalid integer suffix", t);
+
+		throw std::runtime_error("Lexer error");
 	}
 
 	nextChar();
+	length++;
 
 	int value = 0;
-	unsigned int length = 0;
 	while (isHex(ch)) {
 		value = (value << 4) + toHex(ch);
 
@@ -164,11 +125,60 @@ Token Scanner::getHexadecimalToken() {
 		length++;
 	}
 
-	if (isalpha(ch)) {
-		//TODO: error
+	if (isalnum(ch)) {
+		while (isalnum(ch)) {
+			length++;
+			nextChar();
+		}
+
+		Token t(UNKNOWN, position, length);
+		src.raiseError("Invalid integer suffix", t);
+
+		throw std::runtime_error("Lexer error");
 	}
 
-	return Token(HEX_NUMBER, begIndex, length, "", value);
+	return Token(HEX_NUMBER, position, length, "", value);
+}
+
+Token Scanner::getOperatorToken() {
+	switch (ch) {
+		case '+':
+			nextChar();
+			return Token(ADD_OPERATOR, position, 1);
+		case '-':
+			nextChar();
+			return Token(SUBTR_OPERATOR, position, 1);
+		case '*':
+			nextChar();
+			return Token(MUL_OPERATOR, position, 1);
+		case '(':
+			nextChar();
+			return Token(OPEN_PARENT, position, 1);
+		case ')':
+			nextChar();
+			return Token(CLOSE_PARENT, position, 1);
+		case '{':
+			nextChar();
+			return Token(OPEN_BRACK, position, 1);
+		case '}':
+			nextChar();
+			return Token(CLOSE_BRACK, position, 1);
+		case ';':
+			nextChar();
+			return Token(SEMICOLON, position, 1);
+		case '=':
+			nextChar();
+			return Token(ASSIGNMENT, position, 1);
+		case ',':
+			nextChar();
+			return Token(COMMA, position, 1);
+		default:
+			Token t(UNKNOWN, position, 1);
+		std::cout << "token length: " << t.length << std::endl;
+			nextChar();
+			src.raiseError("Unknown token: ", t);
+			throw std::runtime_error("Unknown token\n");
+	}
 }
 
 Token Scanner::getConstStringToken(const int c) {
@@ -182,14 +192,14 @@ Token Scanner::getConstStringToken(const int c) {
 	}
 
 	if (ch == EOF) {
-		Token t(UNKNOWN, begIndex, str.size() + 1);
+		Token t(UNKNOWN, position, str.size() + 1);
 		src.raiseError("Quotation not closed", t);
 		return Token();
 	}
 
 	nextChar();
 
-	return Token(STRING_TYPE, begIndex, str.size(), str);
+	return Token(STRING_TYPE, position, str.size(), str);
 }
 
 bool Scanner::isHex(const int c) {
@@ -204,4 +214,14 @@ int Scanner::toHex(const int c) {
 		return c - 'a' + 10;
 
 	return -1;
+}
+
+void Scanner::skipSpaces() {
+	while (isspace(ch) || ch == '#') {
+		nextChar();
+
+		if (ch == '#')
+			while (ch != '\n')
+				nextChar();
+	}
 }

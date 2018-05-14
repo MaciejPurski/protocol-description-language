@@ -10,15 +10,24 @@ enum TokenType {
 	SEMICOLON, ASSIGNMENT, DEC_NUMBER, HEX_NUMBER, COMMA, END, UNKNOWN, IDENTIFIER
 };
 
+struct Position {
+	unsigned int filePostiion;
+	unsigned int column;
+	unsigned int line;
+};
 struct Token {
 	TokenType type;
 	std::string stringValue;
 	unsigned int intValue;
-	unsigned int position;
+
+	Position position;
 	unsigned int length;
 
-	explicit Token(TokenType nType, unsigned int nposition, unsigned int nlength, std::string str = "", unsigned int nValue = 0) :
-			position(nposition), length(nlength), type(nType), stringValue(str), intValue(nValue)  {}
+	explicit Token(TokenType nType, Position nPosition,
+	               unsigned int nlength,
+	               std::string str = "",
+	               unsigned int nValue = 0) :
+			position(nPosition), length(nlength), type(nType), stringValue(str), intValue(nValue)  {}
 
 	Token() {}
 };

@@ -43,10 +43,10 @@ std::unique_ptr<Sequence> Parser::parseSequence() {
 	std::vector<std::unique_ptr<Operation>> operations;
 
 	// sequence must begin with a "sequence" keyword
-	if (!consume(true, SEQUENCE_KEYWORD))
+	if (!consume(SEQUENCE_KEYWORD, true))
 		return nullptr;
 
-	if (!consumeIdentifier(false, name))
+	if (!consumeIdentifier(name, false))
 		return nullptr;
 
 	std::unique_ptr<Block> block = parseBlock();
@@ -61,13 +61,13 @@ std::unique_ptr<Block> Parser::parseBlock() {
 	std::vector<std::unique_ptr<Operation>> operations;
 	std::unique_ptr<Operation> o;
 
-	if (!consume(true, OPEN_BRACK))
+	if (!consume(OPEN_BRACK, true))
 		return nullptr;
 
 	while ((o = parseOperation()) != nullptr)
 		operations.push_back(std::move(o));
 
-	if (!consume(false, CLOSE_BRACK))
+	if (!consume(CLOSE_BRACK, false))
 		return nullptr;
 
 
@@ -78,12 +78,13 @@ std::unique_ptr<Sequence> Parser::parseProtocol() {
 	std::string name;
 	std::vector<std::unique_ptr<Operation>> operations;
 
+	std::cout << "parse protocol\n";
 	//TODO: common
 	// sequence must begin with a "sequence" keyword
-	if (!consume(true, PROTOCOL_KEYWORD))
+	if (!consume(PROTOCOL_KEYWORD, true))
 		return nullptr;
 
-	if (!consumeIdentifier(false, name))
+	if (!consumeIdentifier(name, false))
 		return nullptr;
 
 	std::unique_ptr<Block> block = parseBlock();
@@ -100,19 +101,19 @@ std::unique_ptr<Packet> Parser::parsePacket() {
     std::unique_ptr<Field> f;
 
     // packet must begin with a "packet" keyword
-    if (!consume(true, PACKET_KEYWORD))
+    if (!consume(PACKET_KEYWORD, true))
 	    return nullptr;
 
-	if (!consumeIdentifier(false, name))
+	if (!consumeIdentifier(name, false))
 		return nullptr;
 
-	if (!consume(false, OPEN_BRACK))
+	if (!consume(OPEN_BRACK, false))
 		return nullptr;
 
 	while ((f = parseField()) != nullptr)
 		fields.push_back(std::move(f));
 
-	if (!consume(false, CLOSE_BRACK))
+	if (!consume(CLOSE_BRACK, false))
 		return nullptr;
 
     return std::make_unique<Packet>(name, std::move(fields));
@@ -141,7 +142,7 @@ std::unique_ptr<Reference> Parser::parseReference() {
 	std::unique_ptr<Reference> ref;
 	std::string name;
 
-	if (!consumeIdentifier(true, name))
+	if (!consumeIdentifier(name, true))
 		return nullptr;
 
 	// try to parse sequence reference, if it fails, treat it as a packet reference
@@ -151,7 +152,7 @@ std::unique_ptr<Reference> Parser::parseReference() {
 
 	// reference name is a common field of packet reference and sequence reference
 	ref->name = name;
-	if (!consume(false, SEMICOLON))
+	if (!consume(SEMICOLON, false))
 		return nullptr;
 
 	return ref;
@@ -174,7 +175,7 @@ std::unique_ptr<AltOperation> Parser::parseAltOperation() {
 	std::vector<std::unique_ptr<Block>> blocks;
 	std::unique_ptr<Block> b;
 
-	if (!consume(true, ALT_KEYWORD))
+	if (!consume(ALT_KEYWORD, true))
 		return nullptr;
 
 	if ((b = parseBlock()) == nullptr)
@@ -183,7 +184,7 @@ std::unique_ptr<AltOperation> Parser::parseAltOperation() {
 	blocks.push_back(std::move(b));
 
 	// need at least one "or" statement
-	if (!consume(false, OR_KEYWORD))
+	if (!consume(OR_KEYWORD, false))
 		return nullptr;
 
 	do  {
@@ -191,16 +192,16 @@ std::unique_ptr<AltOperation> Parser::parseAltOperation() {
 			throw std::runtime_error("Expected block");
 
 		blocks.push_back(std::move(b));
-	} while (consume(true, OR_KEYWORD));
+	} while (consume(OR_KEYWORD, true));
 
 	return std::make_unique<AltOperation>(blocks);
 }
 
 std::unique_ptr<SequenceReference> Parser::parseSequenceReference() {
-	if (!consume(true, OPEN_PARENT))
+	if (!consume(OPEN_PARENT, true))
 		return nullptr;
 
-	if (!consume(false, CLOSE_PARENT))
+	if (!consume(CLOSE_PARENT, false))
 		return nullptr;
 
 	return std::make_unique<SequenceReference>();
@@ -210,13 +211,13 @@ std::unique_ptr<RepeatOperation> Parser::parseSimpleRepeatOperation() {
 	unsigned int repeatFrom;
 	unsigned int repeatTo;
 
-	if (consume(true, ITERATE_KEYWORD)) {
+	if (consume(ITERATE_KEYWORD, true)) {
 		repeatFrom = 0;
 		repeatTo = UINT_MAX;
-	} else if (consume(true, DOITERATE_KEYWORD)) {
+	} else if (consume(DOITERATE_KEYWORD, true)) {
 		repeatFrom = 1;
 		repeatTo = UINT_MAX;
-	} else if (consume(true, OPT_KEYWORD)) {
+	} else if (consume(OPT_KEYWORD, true)) {
 		repeatFrom = 0;
 		repeatTo = 1;
 	} else {
@@ -236,23 +237,23 @@ std::unique_ptr<RepeatOperation> Parser::parseCompoundRepeatOperation() {
 	unsigned int repeatTo;
 	bool readFrom = false;
 
-	if (!consume(true, REPEAT_KEYWORD))
+	if (!consume(REPEAT_KEYWORD, true))
 		return nullptr;
 
-	if (!consume(false, OPEN_PARENT))
+	if (!consume(OPEN_PARENT, false))
 		return nullptr;
 
-	if (consumeNumber(true, repeatFrom)) {
+	if (consumeNumber(repeatFrom, true)) {
 		readFrom = true;
 	} else {
 	    repeatFrom = 0;
 	}
 
 	// if there is a comma, we might try to consume a second number
-	if (consume(true, COMMA)) {
+	if (consume(COMMA, true)) {
 
 	    // if there is no second number after a comma
-	    if (!consumeNumber(true, repeatTo))
+	    if (!consumeNumber(repeatTo, true))
 	    	repeatTo = UINT_MAX;
 	} else if (!readFrom) {
 		// () - case
@@ -262,7 +263,7 @@ std::unique_ptr<RepeatOperation> Parser::parseCompoundRepeatOperation() {
 		repeatTo = repeatFrom;
 	}
 
-	if (!consume(false, CLOSE_PARENT))
+	if (!consume(CLOSE_PARENT, false))
 		return nullptr;
 
     std::unique_ptr<Block> b;
@@ -282,18 +283,18 @@ std::unique_ptr<Field> Parser::parseField() {
 	if ((type = parseType()) == nullptr)
 		return nullptr;
 
-	if (!consumeIdentifier(false, name))
+	if (!consumeIdentifier(name, false))
 		return nullptr;
 
 	// there is a value assigned to the field
-	if (consume(true, ASSIGNMENT)) {
+	if (consume(ASSIGNMENT, true)) {
 		isAssigned = true;
 
-		if (!consumeNumber(false, valueAssigned))
+		if (!consumeNumber(valueAssigned, false))
 			return nullptr;
 	}
 
-	if (!consume(false, SEMICOLON))
+	if (!consume(SEMICOLON, false))
 		return nullptr;
 
 	return std::make_unique<Field>(std::move(type), name, isAssigned, valueAssigned);
@@ -303,16 +304,16 @@ std::unique_ptr<Type> Parser::parseType() {
 	TokenType type;
 	std::unique_ptr<Expression> length;
 
-	if (!consumeType(true, type))
+	if (!consumeType(type, true))
 		return nullptr;
 
-	if (!consume(false, OPEN_PARENT))
+	if (!consume(OPEN_PARENT, false))
 		return nullptr;
 
 	if ((length = parseExpression()) == nullptr)
 		return nullptr;
 
-	if (!consume(false, CLOSE_PARENT))
+	if (!consume(CLOSE_PARENT, false))
 		return nullptr;
 
 	return std::make_unique<Type>(type, length);
@@ -330,7 +331,7 @@ std::unique_ptr<Expression> Parser::parseExpression() {
 
 	operands.push_back(std::move(op));
 
-	while (consumeOperator(true, t)) {
+	while (consumeOperator(t, true)) {
 		operators.push_back(t);
 
 		if ((op = parseOperand()) == nullptr)
@@ -346,19 +347,18 @@ std::unique_ptr<Operand> Parser::parseOperand() {
 	std::string str;
 	unsigned int value;
 
-	if (consumeNumber(true, value))
+	if (consumeNumber(value, true))
 		return std::make_unique<Number>(value);
 
-	if (consumeIdentifier(true, str))
+	if (consumeIdentifier(str, true))
 		return std::make_unique<Identifier>(str);
 
 	return nullptr;
 }
 
-bool Parser::consume(bool isPermissive, TokenType expected) {
+bool Parser::consume(TokenType expected, bool isPermissive) {
 	if (token.type == expected) {
 		nextToken();
-
 		return true;
 	}
 
@@ -367,13 +367,13 @@ bool Parser::consume(bool isPermissive, TokenType expected) {
 		src.raiseError("Expected " + strToWhite("'" + tokenToString(expected) + "'") + " before " +
 		               strToWhite("'" + tokenToString(token.type) + "'"), token);
 
-		nextToken();
+		throw std::runtime_error("Syntax error\n");
 	}
 
 	return false;
 }
 
-bool Parser::consumeIdentifier(bool isPermissive, std::string &str) {
+bool Parser::consumeIdentifier(std::string &str, bool isPermissive) {
 	if (token.type == IDENTIFIER) {
 		str = token.stringValue;
 		nextToken();
@@ -382,13 +382,13 @@ bool Parser::consumeIdentifier(bool isPermissive, std::string &str) {
 		src.raiseError("Expected identifier before " +
 		               strToWhite("'" + tokenToString(token.type) + "'"), token);
 
-		nextToken();
-
-		return false;
+		throw std::runtime_error("Syntax error\n");
 	}
+
+	return false;
 }
 
-bool Parser::consumeNumber(bool isPermissive, unsigned int &number) {
+bool Parser::consumeNumber(unsigned int &number, bool isPermissive) {
 	if (token.type == DEC_NUMBER || token.type == HEX_NUMBER) {
 		number = token.intValue;
 		nextToken();
@@ -406,7 +406,7 @@ bool Parser::consumeNumber(bool isPermissive, unsigned int &number) {
 	return false;
 }
 
-bool Parser::consumeType(bool isPermissive, enum TokenType &type) {
+bool Parser::consumeType(enum TokenType &type, bool isPermissive) {
 	if (token.type != INT_TYPE && token.type != UINT_TYPE && token.type != BYTES_TYPE &&
 			token.type != BITS_TYPE && token.type != STRING_TYPE) {
 
@@ -414,10 +414,8 @@ bool Parser::consumeType(bool isPermissive, enum TokenType &type) {
 			src.raiseError("Expected identifier before " +
 			               strToWhite("'" + tokenToString(token.type) + "'"), token);
 
-			nextToken();
+			throw std::runtime_error("Syntax error\n");
 		}
-
-
 
 		return false;
 	}
@@ -430,14 +428,14 @@ bool Parser::consumeType(bool isPermissive, enum TokenType &type) {
 }
 
 //parse operand
-bool Parser::consumeOperator(bool isPermissive, TokenType &type) {
+bool Parser::consumeOperator(TokenType &type, bool isPermissive) {
 	if (token.type != ADD_OPERATOR && token.type != MUL_OPERATOR && token.type != SUBTR_OPERATOR) {
 
 		if (!isPermissive) {
 			src.raiseError("Expected operator before " +
 			               strToWhite("'" + tokenToString(token.type) + "'"), token);
 
-			nextToken();
+			throw std::runtime_error("Syntax error\n");
 		}
 
 		return false;
