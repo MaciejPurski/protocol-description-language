@@ -63,7 +63,6 @@ int Source::nextChar() {
 	if (prevChar == '\n') {
 		linePosition++;
 		characterPosition = 0;
-		std::cout << "new line\n";
 	}
 
 	prevChar = nextChar;

@@ -1,6 +1,7 @@
-#include "PacketsParser.h"
+#include "PacketsScanner.h"
 
-void PacketsParser::parsePackets() {
+void PacketsScanner::parsePackets(std::unordered_map<uint64_t, std::unique_ptr<Packet>> pidMap,
+                                   unsigned int pidOffset, unsigned int pidLength) {
 	int c;
 
 	while ((c = file.get()) != EOF) {
@@ -68,7 +69,7 @@ void PacketsParser::parsePackets() {
 
 }
 
-uint64_t PacketsParser::parseUInt(char *buf, unsigned int size) {
+uint64_t PacketsScanner::parseUInt(char *buf, unsigned int size) {
 	uint64_t result = 0;
 
 	for (int i = 0; i < size; i++) {
@@ -78,7 +79,7 @@ uint64_t PacketsParser::parseUInt(char *buf, unsigned int size) {
 	return result;
 }
 
-int64_t PacketsParser::parseInt(char *buf, unsigned int size) {
+int64_t PacketsScanner::parseInt(char *buf, unsigned int size) {
 	uint64_t result = 0;
 
 	for (int i = 0; i < size; i++) {
@@ -88,11 +89,11 @@ int64_t PacketsParser::parseInt(char *buf, unsigned int size) {
 	return result;
 }
 
-std::string PacketsParser::parseString(char *buf, unsigned int size) {
+std::string PacketsScanner::parseString(char *buf, unsigned int size) {
 	return std::string(buf);
 }
 
-void PacketsParser::getBytes(std::vector<char> &buf, unsigned int n) {
+void PacketsScanner::getBytes(std::vector<char> &buf, unsigned int n) {
 	int c;
 
 	for (unsigned int i = 0; i < n; i++) {
@@ -106,16 +107,12 @@ void PacketsParser::getBytes(std::vector<char> &buf, unsigned int n) {
 
 }
 
-void PacketsParser::showPacket() {
+void PacketsScanner::showPacket() {
 	for (auto p : packets)
 		p.show();
 }
 
-PacketsParser::PacketsParser(const char *fileName,
-                             std::unordered_map<uint64_t, std::unique_ptr<Packet>> pidMap,
-                             unsigned int pidOffset, unsigned int pidLength) : pidMap(std::move(pidMap)),
-                                                                               pidOffset(pidOffset),
-                                                                               pidLength(pidLength) {
+PacketsScanner::PacketsScanner(const char *fileName) {
 	file.open(fileName, std::ios::in);
 
 	if (!file.is_open())

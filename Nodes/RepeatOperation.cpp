@@ -15,28 +15,22 @@ void RepeatOperation::traverseParseTree(int level) {
 }
 
 bool
-RepeatOperation::execute(std::deque<std::string> &callQueue, unsigned int depth, unsigned int &pointerPosition) {
+RepeatOperation::execute(ProtocolParserState &state, unsigned int depth) {
 	unsigned int counter = 0;
-	bool success;
+
 	// values to be restored in case of failure
-	unsigned int oldPosition = pointerPosition;
-	unsigned int queueSize = callQueue.size();
+	state.saveCurrentState();
 
-	do {
-		success = block->execute(callQueue, depth, pointerPosition);
-
-		if (success)
+	while (block->execute(state, depth))
 			counter++;
-
-	} while (success);
 
 	if (counter < repeatFrom || counter > repeatTo) {
 		//restore position and queue size
-		pointerPosition = oldPosition;
-		callQueue.resize(queueSize);
+		state.restoreState();
 
 		return false;
 	}
+	state.popState();
 
 	return true;
 }

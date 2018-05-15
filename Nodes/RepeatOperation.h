@@ -10,8 +10,7 @@ public:
 	unsigned int repeatTo;
 	std::unique_ptr<Block> block;
 	void traverseParseTree(int level);
-	bool execute(std::deque<std::string> &callQueue, unsigned int depth,
-	                  unsigned int &pointerPosition);
+	bool execute(ProtocolParserState &state, unsigned int depth);
 
 	RepeatOperation(unsigned int from, unsigned int to, std::unique_ptr<Block> &b) : repeatFrom(from),
 	                                                                                 repeatTo(to),

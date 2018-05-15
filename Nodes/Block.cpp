@@ -11,10 +11,16 @@ void Block::traverseParseTree(int level) {
 		o->traverseParseTree(level + 1);
 }
 
-bool Block::execute(std::deque<std::string> &callQueue, unsigned int depth, unsigned int &pointerPosition) {
+bool Block::execute(ProtocolParserState &state, unsigned int depth) {
+	state.saveCurrentState();
+
 	for (const auto &op : operations)
-		if (!op->execute(callQueue, depth, pointerPosition))
+		if (!op->execute(state, depth)) {
+			state.restoreState();
 			return false;
+		}
+
+		state.popState();
 
 	return true;
 }

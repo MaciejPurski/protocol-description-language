@@ -26,13 +26,8 @@ std::unique_ptr<Protocol> Parser::parse() {
 			sequences.emplace_back(std::move(s));
 	}
 
-	if (src.getNErrors() > 0) {
-		std::cout << "parsing failed\n";
-		return nullptr;
-	}
-
 	if ((protocol = parseProtocol()) == nullptr) {
-		return nullptr;
+		throw std::runtime_error("Missing protocol deficinition");
 	}
 
 	return std::make_unique<Protocol>(packets, sequences, protocol);
@@ -46,8 +41,7 @@ std::unique_ptr<Sequence> Parser::parseSequence() {
 	if (!consume(SEQUENCE_KEYWORD, true))
 		return nullptr;
 
-	if (!consumeIdentifier(name, false))
-		return nullptr;
+	consumeIdentifier(name, false);
 
 	std::unique_ptr<Block> block = parseBlock();
 
@@ -67,9 +61,7 @@ std::unique_ptr<Block> Parser::parseBlock() {
 	while ((o = parseOperation()) != nullptr)
 		operations.push_back(std::move(o));
 
-	if (!consume(CLOSE_BRACK, false))
-		return nullptr;
-
+	consume(CLOSE_BRACK, false);
 
 	return std::make_unique<Block>(operations);
 }
@@ -78,19 +70,16 @@ std::unique_ptr<Sequence> Parser::parseProtocol() {
 	std::string name;
 	std::vector<std::unique_ptr<Operation>> operations;
 
-	std::cout << "parse protocol\n";
-	//TODO: common
 	// sequence must begin with a "sequence" keyword
 	if (!consume(PROTOCOL_KEYWORD, true))
 		return nullptr;
 
-	if (!consumeIdentifier(name, false))
-		return nullptr;
+	consumeIdentifier(name, false);
 
 	std::unique_ptr<Block> block = parseBlock();
 
 	if (block == nullptr)
-		return nullptr;
+		throw std::runtime_error("Expected block\n");
 
 	return std::make_unique<Sequence>(name, block);
 }
@@ -104,17 +93,14 @@ std::unique_ptr<Packet> Parser::parsePacket() {
     if (!consume(PACKET_KEYWORD, true))
 	    return nullptr;
 
-	if (!consumeIdentifier(name, false))
-		return nullptr;
+	consumeIdentifier(name, false);
 
-	if (!consume(OPEN_BRACK, false))
-		return nullptr;
+	consume(OPEN_BRACK, false);
 
 	while ((f = parseField()) != nullptr)
 		fields.push_back(std::move(f));
 
-	if (!consume(CLOSE_BRACK, false))
-		return nullptr;
+	consume(CLOSE_BRACK, false);
 
     return std::make_unique<Packet>(name, std::move(fields));
 }
@@ -152,8 +138,7 @@ std::unique_ptr<Reference> Parser::parseReference() {
 
 	// reference name is a common field of packet reference and sequence reference
 	ref->name = name;
-	if (!consume(SEMICOLON, false))
-		return nullptr;
+	consume(SEMICOLON, false);
 
 	return ref;
 }
@@ -184,8 +169,8 @@ std::unique_ptr<AltOperation> Parser::parseAltOperation() {
 	blocks.push_back(std::move(b));
 
 	// need at least one "or" statement
-	if (!consume(OR_KEYWORD, false))
-		return nullptr;
+	consume(OR_KEYWORD, false);
+
 
 	do  {
 		if ((b = parseBlock()) == nullptr)
@@ -201,8 +186,7 @@ std::unique_ptr<SequenceReference> Parser::parseSequenceReference() {
 	if (!consume(OPEN_PARENT, true))
 		return nullptr;
 
-	if (!consume(CLOSE_PARENT, false))
-		return nullptr;
+	consume(CLOSE_PARENT, false);
 
 	return std::make_unique<SequenceReference>();
 }
@@ -227,7 +211,7 @@ std::unique_ptr<RepeatOperation> Parser::parseSimpleRepeatOperation() {
 	std::unique_ptr<Block> b;
 
 	if ((b = parseBlock()) == nullptr)
-		return nullptr;
+		throw std::runtime_error("Block expected");
 
 	return std::make_unique<RepeatOperation>(repeatFrom, repeatTo, b);
 }
@@ -263,8 +247,7 @@ std::unique_ptr<RepeatOperation> Parser::parseCompoundRepeatOperation() {
 		repeatTo = repeatFrom;
 	}
 
-	if (!consume(CLOSE_PARENT, false))
-		return nullptr;
+	consume(CLOSE_PARENT, false);
 
     std::unique_ptr<Block> b;
 
@@ -283,19 +266,16 @@ std::unique_ptr<Field> Parser::parseField() {
 	if ((type = parseType()) == nullptr)
 		return nullptr;
 
-	if (!consumeIdentifier(name, false))
-		return nullptr;
+	consumeIdentifier(name, false);
 
 	// there is a value assigned to the field
 	if (consume(ASSIGNMENT, true)) {
 		isAssigned = true;
 
-		if (!consumeNumber(valueAssigned, false))
-			return nullptr;
+		consumeNumber(valueAssigned, false);
 	}
 
-	if (!consume(SEMICOLON, false))
-		return nullptr;
+	consume(SEMICOLON, false);
 
 	return std::make_unique<Field>(std::move(type), name, isAssigned, valueAssigned);
 }
@@ -311,10 +291,9 @@ std::unique_ptr<Type> Parser::parseType() {
 		return nullptr;
 
 	if ((length = parseExpression()) == nullptr)
-		return nullptr;
+		throw std::runtime_error("Expected expression");
 
-	if (!consume(CLOSE_PARENT, false))
-		return nullptr;
+	consume(CLOSE_PARENT, false);
 
 	return std::make_unique<Type>(type, length);
 }
@@ -324,7 +303,6 @@ std::unique_ptr<Expression> Parser::parseExpression() {
 	std::vector<TokenType> operators;
 	std::unique_ptr<Operand> op;
 	TokenType t;
-
 
 	if ((op = parseOperand()) == nullptr)
 		return nullptr;

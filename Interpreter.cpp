@@ -6,30 +6,33 @@
 bool Interpreter::fillPacketsMap() {
 	std::unordered_set<std::string> packetsMap;
 	std::unordered_map<uint64_t, std::unique_ptr<Packet>> pidMap;
+	bool assignedPid;
+	unsigned int pidOffset;
+	unsigned int pidLength;
 
 	for (auto &p : prot->packets) {
 		// names must be unique
 		if (!packetsMap.insert(p->name).second) {
 			std::cerr << "Packet of pid " << strToWhite("'" + std::to_string(p->pid) + "'") << " already defined!\n";
-			return false;
+			throw std::runtime_error("Semantic error\n");
 		}
 
 		// find packet's pid
 		if (!p->setPid(assignedPid, pidOffset, pidLength))
-			return false;
+			throw std::runtime_error("Semantic error\n");
 
 		// pids must be unique
 		if (pidMap.find(p->pid) != pidMap.end()) {
 			std::cerr << "Packet of pid " << strToWhite("'" + std::to_string(p->pid) + "'") << " already defined!\n";
-			return false;
+			throw std::runtime_error("Semantic error\n");
 		}
 
 		pidMap[p->pid] = std::move(p);
 	}
 
-	packetsParser = std::make_shared<PacketsParser>(fileName, std::move(pidMap), pidOffset, pidLength);
-
-	PacketReference::parser = packetsParser;
+	// perform packets dissection
+	packetsScanner.parsePackets(std::move(pidMap), pidOffset, pidLength);
+	packetsScanner.showPacket();
 
 	return true;
 }

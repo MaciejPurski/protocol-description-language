@@ -6,8 +6,7 @@
 
 class Reference : public Operation {
 public:
-	virtual bool execute(std::deque<std::string> &callQueue, unsigned int depth,
-	                          unsigned int &positionPointer) = 0;
+	virtual bool execute(ProtocolParserState &state, unsigned int depth) = 0;
 	virtual void traverseParseTree(int level) = 0;
 	std::string name;
 };

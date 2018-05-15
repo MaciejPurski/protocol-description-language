@@ -6,8 +6,7 @@
 #include <unordered_map>
 #include <fstream>
 
-
-class PacketsParser {
+class PacketsScanner {
 private:
 	unsigned int currentPosition = 0;
 
@@ -19,17 +18,13 @@ private:
 
 	void getBytes(std::vector<char> &buf, unsigned int n);
 
-
 	std::vector<AnalyzerPacket> packets;
 	std::fstream file;
-	std::unordered_map<uint64_t, std::unique_ptr<Packet>> pidMap;
-	unsigned int pidOffset;
-	unsigned int pidLength;
 public:
-	PacketsParser(const char *fileName, std::unordered_map<uint64_t, std::unique_ptr<Packet>> pidMap,
-	              unsigned int pidOffset, unsigned int pidLength);
+	PacketsScanner(const char *fileName);
 
-	void parsePackets();
+	void parsePackets(std::unordered_map<uint64_t, std::unique_ptr<Packet>> pidMap,
+	                   unsigned int pidOffset, unsigned int pidLength);
 
 	void showPacket();
 

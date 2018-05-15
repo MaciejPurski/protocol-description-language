@@ -1,5 +1,6 @@
 #include "Sequence.h"
 #include "../Utils.h"
+#include "../Analyzer/ProtocolParserState.h"
 
 void Sequence::traverseParseTree(int level) {
 	for (int i = 0; i < level; i++)
@@ -12,24 +13,10 @@ void Sequence::traverseParseTree(int level) {
 	block->traverseParseTree(level + 1);
 }
 
-bool Sequence::execute(std::deque<std::string> &callDeque, unsigned int depth, unsigned int &currentPosition) {
+bool Sequence::execute(ProtocolParserState &state, unsigned int depth) {
 	std::string str;
-	// remember current position in order to restore it later
-	unsigned int oldPosition = currentPosition;
-	unsigned long oldSize = callDeque.size();
+	// remember current sequence
+	state.pushSequence(name, depth);
 
-	for (int i = 0; i < depth; i++) {
-		str += '\t';
-	}
-
-	callDeque.push_back("\n" + strToBlue(str + "SEQUENCE call: ") + strToWhite(name));
-
-	// execution failed
-	if (!block->execute(callDeque, depth + 1, currentPosition)) {
-		callDeque.resize(oldSize);
-		currentPosition = oldPosition;
-		return false;
-	}
-
-	return true;
+	return block->execute(state, depth + 1);
 }

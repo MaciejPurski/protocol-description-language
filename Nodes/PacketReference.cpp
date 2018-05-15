@@ -1,8 +1,6 @@
 #include "PacketReference.h"
 #include "../Utils.h"
 
-std::shared_ptr<PacketsParser> PacketReference::parser = nullptr;
-
 void PacketReference::traverseParseTree(int level) {
 	for (int i = 0; i < level; i++)
 		std::cout << '-';
@@ -10,20 +8,12 @@ void PacketReference::traverseParseTree(int level) {
 	std::cout << "PACKET REFERENCE name: " << Reference::name << std::endl;
 }
 
-//TODO: interfejs do zrodla danych
-bool PacketReference::execute(std::deque<std::string> &callQueue, unsigned int depth,
-                                   unsigned int &pointerPosition) {
+bool PacketReference::execute(ProtocolParserState &state, unsigned int depth) {
 
-	if (pointerPosition >= parser->getNPackets() || parser->getPacket(pointerPosition).name != Reference::name) {
+	if (state.endOfBuffer() || state.getCurrentPacketName() != Reference::name) {
 		return false;
 	}
-
-	std::string str;
-	for (int i = 0; i < depth; i++)
-		str += '\t';
-
-	callQueue.push_back(strToYellow(str + "PACKET: ") + strToWhite(parser->getPacket(pointerPosition).toStr()));
-	pointerPosition++;
+	state.pushCurrentPacket(depth);
 
 	return true;
 }

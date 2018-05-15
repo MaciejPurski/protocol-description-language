@@ -7,13 +7,14 @@
 #include <iostream>
 #include "Operation.h"
 #include "Node.h"
+#include "../Analyzer/ProtocolParserState.h"
 
 class Block : public Node, Executable {
 public:
 	std::vector<std::unique_ptr<Operation>> operations;
 
-	bool execute(std::deque<std::string> &callQueue, unsigned int depth,
-	             unsigned int &pointerPosition);
+	bool execute(ProtocolParserState &state, unsigned int depth);
+
 	Block(std::vector<std::unique_ptr<Operation>> &o) : operations(std::move(o)) { }
 
 	void traverseParseTree(int level);

@@ -22,7 +22,7 @@ packet d {
 
 sequence aab_cd {
 	alt {
-		a;
+		c;
 		a;
 		b;
 	} or {

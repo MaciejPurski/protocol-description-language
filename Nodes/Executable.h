@@ -3,9 +3,9 @@
 
 #include <deque>
 #include <string>
+#include "../Analyzer/ProtocolParserState.h"
 
 class Executable {
-	virtual bool execute(std::deque<std::string> &callQueue, unsigned int depth,
-						 unsigned int &pointerPosition) = 0;
+	virtual bool execute(ProtocolParserState &state, unsigned int depth) = 0;
 };
 #endif

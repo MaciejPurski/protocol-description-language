@@ -4,15 +4,12 @@
 
 #include "Operation.h"
 #include "Reference.h"
-#include "../Analyzer/PacketsParser.h"
+#include "../Analyzer/PacketsScanner.h"
 #include <iostream>
 
 class PacketReference : public Reference {
 public:
-	static std::shared_ptr<PacketsParser> parser;
-
-	bool execute(std::deque<std::string> &callQueue, unsigned int depth,
-	                  unsigned int &pointerPosition);
+	bool execute(ProtocolParserState &state, unsigned int depth);
 	void traverseParseTree(int level);
 	PacketReference() {}
 };

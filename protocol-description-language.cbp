@@ -8,218 +8,221 @@
 		<Option virtualFolders="CMake Files\;"/>
 		<Build>
 			<Target title="all">
-				<Option working_dir="/home/maciej/studia/TKOM"/>
+				<Option working_dir="/home/maciej/tkom/protocol-description-language"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 all"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="rebuild_cache">
-				<Option working_dir="/home/maciej/studia/TKOM"/>
+				<Option working_dir="/home/maciej/tkom/protocol-description-language"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="edit_cache">
-				<Option working_dir="/home/maciej/studia/TKOM"/>
+				<Option working_dir="/home/maciej/tkom/protocol-description-language"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 edit_cache"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="TKOM">
-				<Option output="/home/maciej/studia/TKOM/TKOM" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/home/maciej/studia/TKOM"/>
+				<Option output="/home/maciej/tkom/protocol-description-language/TKOM" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/maciej/tkom/protocol-description-language"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/usr/include/c++/7"/>
-					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
-					<Add directory="/usr/include/c++/7/backward"/>
-					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/include/c++/6"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/6"/>
+					<Add directory="/usr/include/c++/6/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/6/include"/>
 					<Add directory="/usr/local/include"/>
-					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/6/include-fixed"/>
 					<Add directory="/usr/include/x86_64-linux-gnu"/>
 					<Add directory="/usr/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 TKOM"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 TKOM"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="TKOM/fast">
-				<Option output="/home/maciej/studia/TKOM/TKOM" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/home/maciej/studia/TKOM"/>
+				<Option output="/home/maciej/tkom/protocol-description-language/TKOM" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/maciej/tkom/protocol-description-language"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/usr/include/c++/7"/>
-					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
-					<Add directory="/usr/include/c++/7/backward"/>
-					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/include/c++/6"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/6"/>
+					<Add directory="/usr/include/c++/6/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/6/include"/>
 					<Add directory="/usr/local/include"/>
-					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/6/include-fixed"/>
 					<Add directory="/usr/include/x86_64-linux-gnu"/>
 					<Add directory="/usr/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 TKOM/fast"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/maciej/studia/TKOM/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 TKOM/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/maciej/tkom/protocol-description-language/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/maciej/studia/TKOM/Analyzer/AnalyzerField.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Analyzer/AnalyzerField.cpp">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Analyzer/AnalyzerField.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Analyzer/AnalyzerField.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Analyzer/AnalyzerPacket.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Analyzer/AnalyzerPacket.cpp">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Analyzer/AnalyzerPacket.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Analyzer/AnalyzerPacket.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Analyzer/PacketsParser.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Analyzer/PacketsScanner.cpp">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Analyzer/PacketsParser.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Analyzer/PacketsScanner.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Interpreter.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Analyzer/ProtocolParserState.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Interpreter.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Interpreter.cpp">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/LexerTest.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Interpreter.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/AltOperation.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/LexerTest.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/AltOperation.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/AltOperation.cpp">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/Block.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/AltOperation.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/Block.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/Block.cpp">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/Executable.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/Block.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/Expression.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/Executable.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/Expression.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/Expression.cpp">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/Field.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/Expression.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/Field.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/Field.cpp">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/Node.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/Field.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/Operation.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/Node.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/Packet.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/Operation.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/Packet.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/Packet.cpp">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/PacketReference.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/Packet.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/PacketReference.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/PacketReference.cpp">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/Protocol.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/PacketReference.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/Protocol.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/Protocol.cpp">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/Reference.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/Protocol.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/RepeatOperation.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/Reference.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/RepeatOperation.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/RepeatOperation.cpp">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/Sequence.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/RepeatOperation.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/Sequence.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/Sequence.cpp">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/SequenceReference.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/Sequence.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/SequenceReference.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/SequenceReference.cpp">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/Type.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/SequenceReference.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Nodes/Type.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/Type.cpp">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Parser.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Nodes/Type.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Parser.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Parser.cpp">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/ParserTest.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Parser.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Scanner.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/ParserTest.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Scanner.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Scanner.cpp">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Source.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Scanner.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Source.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Source.cpp">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Token.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Source.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/Utils.h">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Token.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/main.cpp">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/Utils.h">
 			<Option target="TKOM"/>
 		</Unit>
-		<Unit filename="/home/maciej/studia/TKOM/CMakeLists.txt">
+		<Unit filename="/home/maciej/tkom/protocol-description-language/main.cpp">
+			<Option target="TKOM"/>
+		</Unit>
+		<Unit filename="/home/maciej/tkom/protocol-description-language/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
 	</Project>
