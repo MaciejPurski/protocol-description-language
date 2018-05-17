@@ -12,7 +12,6 @@ void AltOperation::traverseParseTree(int level) {
 }
 
 bool AltOperation::execute(ProtocolParserState &state, unsigned int depth) {
-
 	for (const auto &b : blocks) {
 		if (b->execute(state, depth)) {
 			return true;

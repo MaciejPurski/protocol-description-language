@@ -99,7 +99,7 @@ Token Scanner::getHexadecimalToken() {
 	nextChar();
 
 	// decimal 0 value
-	if (!isalpha(ch))
+	if (!isalnum(ch))
 		return Token(DEC_NUMBER, position, 0, "", 0);
 
 	if (ch != 'x') {

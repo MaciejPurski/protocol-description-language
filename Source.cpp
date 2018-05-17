@@ -26,17 +26,15 @@ void Source::raiseError(const std::string &errorDesc, Token &token) {
 
 	for (int i = 0; i < pos.line; i++) {
 		std::getline(file, lineBuf);
-		std::cout << "line: " << lineBuf << std::endl;
 	}
 
-	std::cout << "linebuf: " << lineBuf << std::endl;
 	std::cerr << std::endl;
 
-	std::cerr << strToWhite(fileName + ":" + std::to_string(pos.line) + ":" + std::to_string(pos.column) + ": ")
+	std::cerr << strToWhite(fileName + ":" + std::to_string(pos.line) + ":" + std::to_string(pos.column + 1) + ": ")
 	          << strToRed("error: ") << errorDesc << std::endl;
 
-	std::cerr << lineBuf.substr(0, pos.column - 1) << strToRed(lineBuf.substr(pos.column - 1, token.length))
-	<< lineBuf.substr(pos.column - 1 + token.length) << std::endl;
+	std::cerr << lineBuf.substr(0, pos.column) << strToRed(lineBuf.substr(pos.column, token.length))
+	<< lineBuf.substr(pos.column + token.length) << std::endl;
 
 	for (int i = 0; i < pos.column; i++) {
 		if (lineBuf[i] == '\t')
